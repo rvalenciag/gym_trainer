@@ -1,6 +1,7 @@
 <?php
 // NRutina: reglas de programación de planes (CU06) y consulta del cliente (CU07).
 require_once __DIR__ . '/../Datos/DRutina.php';
+require_once __DIR__ . '/../Datos/DDetalleRutina.php';
 require_once __DIR__ . '/../Datos/DCliente.php';
 require_once __DIR__ . '/../Datos/DEjercicio.php';
 
@@ -14,7 +15,7 @@ class NRutina {
     }
 
     public function listarDetalles($idRutina) {
-        return (new DRutina())->listarDetalles((int)$idRutina);
+        return (new DDetalleRutina())->listarPorRutina((int)$idRutina);
     }
 
     // Valida cabecera + detalle (común a crear y actualizar). Devuelve [errores[], cab, dets].
@@ -88,12 +89,26 @@ class NRutina {
         return [$errores, $cab, $limpios];
     }
 
+    // Composición fuerte sin D->D: N orquesta DRutina + DDetalleRutina dentro de UNA
+    // transacción (wrappers de DRutina; N nunca ve PDO ni SQL). Todo o nada.
     public function crear($idInstructor, $idCliente, $nombre, $ini, $fin, $dets) {
         list($errores, $cab, $limpios) = $this->validar($idInstructor, $idCliente, $nombre, $ini, $fin, $dets);
         if (count($errores) > 0) {
             return ['ok' => false, 'msg' => $errores[0]];
         }
-        $id = (new DRutina())->crearConDetalle($cab, $limpios);
+        $dr = new DRutina();
+        $dd = new DDetalleRutina();
+        $dr->iniciarTransaccion();
+        try {
+            $id = $dr->crearCabecera($cab);
+            foreach ($limpios as $d) {
+                $dd->insertar($id, $d);
+            }
+            $dr->confirmar();
+        } catch (Exception $e) {
+            $dr->revertir();
+            return ['ok' => false, 'msg' => 'No se pudo guardar la rutina'];
+        }
         return $id > 0
             ? ['ok' => true, 'msg' => 'Rutina creada y asignada con éxito al cliente']
             : ['ok' => false, 'msg' => 'No se pudo guardar la rutina'];
@@ -108,7 +123,17 @@ class NRutina {
         if (count($errores) > 0) {
             return ['ok' => false, 'msg' => $errores[0]];
         }
-        $ok = (new DRutina())->actualizarConDetalle((int)$id, $cab, $limpios);
+        $dr = new DRutina();
+        $dr->iniciarTransaccion();
+        try {
+            $dr->actualizarCabecera((int)$id, $cab);
+            (new DDetalleRutina())->reemplazarDeRutina((int)$id, $limpios);
+            $dr->confirmar();
+            $ok = true;
+        } catch (Exception $e) {
+            $dr->revertir();
+            $ok = false;
+        }
         return ['ok' => $ok, 'msg' => $ok ? 'Rutina actualizada correctamente' : 'No se pudo actualizar'];
     }
 
@@ -123,7 +148,7 @@ class NRutina {
         if ($rut === null) {
             return ['rutina' => null, 'detalles' => []];
         }
-        $det = (new DRutina())->listarDetallesPorDia((int)$rut['id'], (int)$dia);
+        $det = (new DDetalleRutina())->listarPorRutinaYDia((int)$rut['id'], (int)$dia);
         return ['rutina' => $rut, 'detalles' => $det];
     }
 }

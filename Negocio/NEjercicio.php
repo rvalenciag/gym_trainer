@@ -2,6 +2,7 @@
 // NEjercicio: reglas del banco de ejercicios (CU04). Uploads e iframe se validan aquí.
 require_once __DIR__ . '/../Datos/DEjercicio.php';
 require_once __DIR__ . '/../Datos/DCategoria.php';
+require_once __DIR__ . '/../Datos/DDetalleRutina.php';
 
 class NEjercicio {
     const TIPOS = ['IMAGEN', 'VIDEO_URL', 'IFRAME_HTML'];
@@ -12,10 +13,6 @@ class NEjercicio {
 
     public function listar() {
         return (new DEjercicio())->listarConCategoria();
-    }
-
-    public function obtener($id) {
-        return (new DEjercicio())->obtenerPorId((int)$id);
     }
 
     private function datosBasicosCompletos($nombre, $idCategoria) {
@@ -158,7 +155,7 @@ class NEjercicio {
             return ['ok' => false, 'msg' => 'El ejercicio no existe'];
         }
         $act = $d->obtenerPorId((int)$id);
-        if ($d->tieneRutinas((int)$id)) {
+        if ((new DDetalleRutina())->contarPorEjercicio((int)$id) > 0) {
             return ['ok' => false, 'msg' => 'No se puede eliminar el ejercicio porque tiene rutinas vinculadas'];
         }
         $ok = $d->eliminar((int)$id);

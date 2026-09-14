@@ -9,12 +9,10 @@ $rutas_instructor = [
     'categorias' => 'PCategorias',      // CU03
     'ejercicios' => 'PEjercicios',      // CU04
     'clientes' => 'PClientes',          // CU05
-    'rutinas' => 'PRutinas',            // CU06 lista
-    'crear_rutina' => 'PCrearRutina',   // CU06 diseño
+    'rutinas' => 'PRutinas',            // CU06 (cabecera + constructor + tabla en una vista)
 ];
 $rutas_cliente = [
-    'mi-rutina' => 'PMiRutina',         // CU07
-    'detalle' => 'PDetalleEjercicio',   // CU07 guía
+    'mi-rutina' => 'PMiRutina',         // CU07 (cabecera + días + guía inline)
 ];
 $archivos = [
     'PLogin' => 'Presentacion/auth/PLogin.php',
@@ -23,9 +21,7 @@ $archivos = [
     'PEjercicios' => 'Presentacion/entrenador/PEjercicios.php',
     'PClientes' => 'Presentacion/entrenador/PClientes.php',
     'PRutinas' => 'Presentacion/entrenador/PRutinas.php',
-    'PCrearRutina' => 'Presentacion/entrenador/PCrearRutina.php',
     'PMiRutina' => 'Presentacion/cliente/PMiRutina.php',
-    'PDetalleEjercicio' => 'Presentacion/cliente/PDetalleEjercicio.php',
 ];
 $inicio_instructor = 'index.php?r=categorias';
 $inicio_cliente = 'index.php?r=mi-rutina';

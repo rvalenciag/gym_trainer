@@ -51,12 +51,4 @@ class DEjercicio {
         $st = $this->pdo->prepare('DELETE FROM EJERCICIO WHERE id = ?');
         return $st->execute([$id]);
     }
-
-    // Para el mensaje amigable antes de que la BD frene con 1451 (RESTRICT).
-    public function tieneRutinas($id) {
-        $st = $this->pdo->prepare('SELECT COUNT(*) AS n FROM DETALLE_RUTINA WHERE id_ejercicio = ?');
-        $st->execute([$id]);
-        $f = $st->fetch();
-        return ((int)$f['n']) > 0;
-    }
 }

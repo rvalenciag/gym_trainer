@@ -21,7 +21,7 @@ function mostrarHeader($titulo) {
             'rutinas' => 'Rutinas',
         ];
         foreach ($items as $k => $v) {
-            $act = ($r === $k || ($k === 'rutinas' && $r === 'crear_rutina')) ? ' active' : '';
+            $act = $r === $k ? ' active' : '';
             $menu .= '<a class="nav-link' . $act . '" href="index.php?r=' . $k . '">' . $v . '</a>';
         }
     } elseif ($rol === 'CLIENTE') {

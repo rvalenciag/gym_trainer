@@ -1,5 +1,7 @@
 <?php
-// DRutina: espejo de RUTINA + DETALLE_RUTINA (composición, CU06/CU07).
+// DRutina: espejo de RUTINA (CU06/CU07). Solo cabecera: el detalle vive en DDetalleRutina
+// (composición fuerte ◆) y lo orquesta NRutina. Prohibido D->D: esta clase jamás instancia
+// otro D. Expone wrappers de transacción para que N coordine ambas tablas sin ver PDO.
 require_once __DIR__ . '/Conexion.php';
 
 class DRutina {
@@ -11,8 +13,7 @@ class DRutina {
     private $fecha_fin;
     private $id_instructor;
     private $id_cliente;
-    // Atributos espejo de DETALLE_RUTINA (viajan en arrays, ver crearConDetalle):
-    // id_rutina, id_ejercicio, dia_semana, series, repeticiones, peso_sugerido, descanso
+    // El detalle vive en DDetalleRutina (composición fuerte, ver esa clase).
 
     public function __construct() {
         $this->pdo = Conexion::get();
@@ -33,70 +34,40 @@ class DRutina {
         return $f === false ? null : $f;
     }
 
-    public function listarDetalles($idRutina) {
-        $st = $this->pdo->prepare(
-            'SELECT D.*, E.nombre AS ejercicio FROM DETALLE_RUTINA D ' .
-            'JOIN EJERCICIO E ON E.id = D.id_ejercicio WHERE D.id_rutina = ? ORDER BY D.dia_semana, D.id'
-        );
-        $st->execute([$idRutina]);
-        return $st->fetchAll();
+    // Wrappers de transacción para que N coordine RUTINA + DETALLE_RUTINA
+    // (mismo PDO singleton: el rollback sigue atómico). N nunca ve PDO ni SQL.
+    public function iniciarTransaccion() {
+        $this->pdo->beginTransaction();
     }
 
-    // Alta en transacción: cabecera + N detalles. Se llama UNA vez al Guardar. Todo o nada.
+    public function confirmar() {
+        $this->pdo->commit();
+    }
+
+    public function revertir() {
+        $this->pdo->rollBack();
+    }
+
+    // Alta de cabecera. El detalle lo inserta N vía DDetalleRutina dentro de la transacción.
     // $cab: [id_instructor, id_cliente, nombre_plan, fecha_inicio, fecha_fin]
-    // $dets[]: [id_ejercicio, dia_semana, series, repeticiones, peso_sugerido, descanso]
-    public function crearConDetalle($cab, $dets) {
-        $this->pdo->beginTransaction();
-        try {
-            $st = $this->pdo->prepare(
-                'INSERT INTO RUTINA(id_instructor, id_cliente, nombre_plan, fecha_inicio, fecha_fin) ' .
-                'VALUES(?, ?, ?, ?, ?)'
-            );
-            $st->execute([$cab['id_instructor'], $cab['id_cliente'], $cab['nombre_plan'],
-                $cab['fecha_inicio'], $cab['fecha_fin']]);
-            $id = (int)$this->pdo->lastInsertId();
-            $st = $this->pdo->prepare(
-                'INSERT INTO DETALLE_RUTINA(id_rutina, id_ejercicio, dia_semana, series, repeticiones, ' .
-                'peso_sugerido, descanso) VALUES(?, ?, ?, ?, ?, ?, ?)'
-            );
-            foreach ($dets as $d) {
-                $st->execute([$id, $d['id_ejercicio'], $d['dia_semana'], $d['series'],
-                    $d['repeticiones'], $d['peso_sugerido'], $d['descanso']]);
-            }
-            $this->pdo->commit();
-            return $id;
-        } catch (Exception $e) {
-            $this->pdo->rollBack();
-            return 0;
-        }
+    public function crearCabecera($cab) {
+        $st = $this->pdo->prepare(
+            'INSERT INTO RUTINA(id_instructor, id_cliente, nombre_plan, fecha_inicio, fecha_fin) ' .
+            'VALUES(?, ?, ?, ?, ?)'
+        );
+        $st->execute([$cab['id_instructor'], $cab['id_cliente'], $cab['nombre_plan'],
+            $cab['fecha_inicio'], $cab['fecha_fin']]);
+        return (int)$this->pdo->lastInsertId();
     }
 
-    // Actualizar: UPDATE cabecera + reemplazo total del detalle (DELETE + INSERT). Todo o nada.
-    public function actualizarConDetalle($id, $cab, $dets) {
-        $this->pdo->beginTransaction();
-        try {
-            $st = $this->pdo->prepare(
-                'UPDATE RUTINA SET id_cliente = ?, nombre_plan = ?, fecha_inicio = ?, fecha_fin = ? ' .
-                'WHERE id = ?'
-            );
-            $st->execute([$cab['id_cliente'], $cab['nombre_plan'], $cab['fecha_inicio'],
-                $cab['fecha_fin'], $id]);
-            $st = $this->pdo->prepare('DELETE FROM DETALLE_RUTINA WHERE id_rutina = ?');
-            $st->execute([$id]);
-            $st = $this->pdo->prepare(
-                'INSERT INTO DETALLE_RUTINA(id_rutina, id_ejercicio, dia_semana, series, repeticiones, ' .
-                'peso_sugerido, descanso) VALUES(?, ?, ?, ?, ?, ?, ?)'
-            );
-            foreach ($dets as $d) {
-                $st->execute([$id, $d['id_ejercicio'], $d['dia_semana'], $d['series'],
-                    $d['repeticiones'], $d['peso_sugerido'], $d['descanso']]);
-            }
-            $this->pdo->commit();
-            return true;
-        } catch (Exception $e) {
-            $this->pdo->rollBack();
-            return false;
-        }
+    // Actualizar solo cabecera. El reemplazo del detalle lo hace N vía DDetalleRutina.
+    public function actualizarCabecera($id, $cab) {
+        $st = $this->pdo->prepare(
+            'UPDATE RUTINA SET id_cliente = ?, nombre_plan = ?, fecha_inicio = ?, fecha_fin = ? ' .
+            'WHERE id = ?'
+        );
+        return $st->execute([$cab['id_cliente'], $cab['nombre_plan'], $cab['fecha_inicio'],
+            $cab['fecha_fin'], $id]);
     }
 
     // Eliminar: basta borrar RUTINA (CASCADE arrastra el DETALLE).
@@ -132,16 +103,5 @@ class DRutina {
         $st->execute([$idCliente, $hoy, $hoy]);
         $f = $st->fetch();
         return $f === false ? null : $f;
-    }
-
-    // CU07: ejercicios de un día con su guía (JOIN ejercicio).
-    public function listarDetallesPorDia($idRutina, $dia) {
-        $st = $this->pdo->prepare(
-            'SELECT D.*, E.nombre AS ejercicio, E.descripcion, E.tipo_multimedia, E.url ' .
-            'FROM DETALLE_RUTINA D JOIN EJERCICIO E ON E.id = D.id_ejercicio ' .
-            'WHERE D.id_rutina = ? AND D.dia_semana = ? ORDER BY D.id'
-        );
-        $st->execute([$idRutina, $dia]);
-        return $st->fetchAll();
     }
 }

@@ -1,5 +1,5 @@
 <?php
-// Guía multimedia de un ejercicio (parcial P, lo usan mis_rutinas y detalle).
+// Guía multimedia de un ejercicio (parcial P, lo usa PMiRutina en la lista del día).
 // $e: fila con descripcion, tipo_multimedia, url.
 defined('APP') || exit('Acceso no permitido');
 
