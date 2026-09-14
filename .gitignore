@@ -1,0 +1,9 @@
+# Documentación y entorno local (no versionar)
+guia/
+docker-compose.yml
+
+# Archivos subidos por usuarios (solo entra el código)
+uploads/ejercicios/*
+uploads/usuarios/*
+!uploads/ejercicios/.gitkeep
+!uploads/usuarios/.gitkeep

@@ -1,0 +1,8 @@
+/* Gym Instructor: ajustes mínimos sobre Bootstrap. Paleta: verde #198754, carbón #212529, ámbar #FFC107. */
+body { min-height: 100vh; }
+.navbar-brand span { letter-spacing: 0.5px; }
+.guia-box { background: #fff; border: 1px solid #dee2e6; border-radius: 0.5rem; padding: 1rem; margin-top: 0.75rem; }
+.guia-img { max-height: 320px; border-radius: 0.5rem; }
+.dia-btn.active { background: #FFC107; border-color: #FFC107; color: #212529; font-weight: bold; }
+.tabla-form { background: #fff; border: 1px solid #dee2e6; border-radius: 0.5rem; padding: 1.25rem; margin-bottom: 1.5rem; }
+.detalle-row td { vertical-align: middle; }
