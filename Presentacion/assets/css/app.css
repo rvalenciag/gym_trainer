@@ -1,8 +1,932 @@
-/* Gym Instructor: ajustes mínimos sobre Bootstrap. Paleta: verde #198754, carbón #212529, ámbar #FFC107. */
-body { min-height: 100vh; }
-.navbar-brand span { letter-spacing: 0.5px; }
-.guia-box { background: #fff; border: 1px solid #dee2e6; border-radius: 0.5rem; padding: 1rem; margin-top: 0.75rem; }
-.guia-img { max-height: 320px; border-radius: 0.5rem; }
-.dia-btn.active { background: #FFC107; border-color: #FFC107; color: #212529; font-weight: bold; }
-.tabla-form { background: #fff; border: 1px solid #dee2e6; border-radius: 0.5rem; padding: 1.25rem; margin-bottom: 1.5rem; }
-.detalle-row td { vertical-align: middle; }
+/* Gym Trainer: componentes compartidos de las pantallas rediseñadas. */
+:root {
+    --gym-navy: #0b2d52;
+    --gym-navy-deep: #082440;
+    --gym-blue: #2563eb;
+    --gym-blue-hover: #1d4ed8;
+    --gym-green: #0a9d58;
+    --gym-red: #ef4444;
+    --gym-text: #10294c;
+    --gym-muted: #64748b;
+    --gym-page: #eef4ff;
+    --gym-line: #d9e3f0;
+    --gym-soft: #edf4ff;
+}
+* {
+    box-sizing: border-box;
+}
+body {
+    min-height: 100vh;
+}
+.gym-icon {
+    width: 1.35em;
+    height: 1.35em;
+    flex: 0 0 auto;
+}
+/* ----- Login ----- */
+.gym-login-body {
+    margin: 0;
+    background: var(--gym-navy);
+    font-family: Inter, system-ui, sans-serif;
+}
+.gym-login-layout {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: minmax(0, 43%) minmax(0, 57%);
+}
+.gym-login-hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 100vh;
+    color: #fff;
+    background: linear-gradient(110deg, rgba(4, 26, 48, .96), rgba(5, 35, 63, .82)), radial-gradient(circle at 70% 36%, rgba(37, 99, 235, .32), transparent 29%), repeating-linear-gradient(120deg, transparent 0 80px, rgba(255,255,255,.035) 81px 83px);
+}
+.gym-login-hero::after {
+    content: '';
+    position: absolute;
+    inset: auto -20% -25% -5%;
+    height: 45%;
+    background: linear-gradient(130deg, transparent 33%, rgba(0,0,0,.22) 33%);
+}
+.gym-login-hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 11vh 2.5rem 3rem;
+    text-align: center;
+}
+.gym-login-brand-mark, .gym-login-user-icon {
+    display: grid;
+    place-items: center;
+    margin: 0 auto;
+    border-radius: 28px;
+    background: var(--gym-blue);
+}
+.gym-login-brand-mark {
+    width: 82px;
+    height: 82px;
+}
+.gym-login-brand-mark svg {
+    width: 48px;
+    height: 48px;
+}
+.gym-login-hero h1 {
+    margin: 1.5rem 0 2.3rem;
+    font-size: clamp(2.5rem, 4vw, 4.4rem);
+    font-weight: 800;
+    letter-spacing: -2px;
+}
+.gym-login-hero h1 strong {
+    color: #3d9cff;
+    font-weight: inherit;
+}
+.gym-login-hero h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 2.4vw, 2.25rem);
+    line-height: 1.5;
+    font-weight: 700;
+}
+.gym-login-accent {
+    display: block;
+    width: 165px;
+    height: 8px;
+    border-radius: 10px;
+    background: #3d9cff;
+    margin: 2rem auto 2.7rem;
+}
+.gym-login-hero p {
+    margin: 0;
+    font-size: clamp(1rem, 1.4vw, 1.3rem);
+    line-height: 1.8;
+    color: #d2ddeb;
+}
+.gym-login-panel {
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+    background: #0c2d51;
+}
+.gym-login-card {
+    width: min(100%, 620px);
+    border-radius: 30px;
+    padding: clamp(2rem, 3.5vw, 3.5rem);
+    background: #fff;
+    text-align: center;
+    box-shadow: 0 18px 55px rgba(0,0,0,.13);
+}
+.gym-login-user-icon {
+    width: 78px;
+    height: 78px;
+    color: #fff;
+}
+.gym-login-user-icon svg {
+    width: 44px;
+    height: 44px;
+}
+.gym-login-card > h2 {
+    margin: 1.4rem 0 .25rem;
+    color: var(--gym-text);
+    font-size: clamp(2rem, 3vw, 2.9rem);
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+.gym-login-card > p {
+    margin: 0 0 1.8rem;
+    color: var(--gym-muted);
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+}
+.gym-login-form {
+    display: grid;
+    gap: 1.2rem;
+    text-align: left;
+}
+.gym-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.gym-input-wrap > svg {
+    position: absolute;
+    left: 1.2rem;
+    width: 30px;
+    height: 30px;
+    color: #61738e;
+    z-index: 1;
+}
+.gym-input-wrap .form-control {
+    height: 62px;
+    padding: .8rem 3.8rem;
+    border: 2px solid #cbd7e6;
+    border-radius: 13px;
+    background: #f8fafc;
+    color: var(--gym-text);
+    font-size: 1.05rem;
+}
+.gym-input-wrap .form-control:focus, .gym-app-body .form-control:focus, .gym-app-body .form-select:focus {
+    border-color: var(--gym-blue);
+    box-shadow: 0 0 0 .2rem rgba(37,99,235,.15);
+}
+.gym-password-toggle {
+    position: absolute;
+    right: .95rem;
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #61738e;
+}
+.gym-password-toggle svg {
+    width: 28px;
+    height: 28px;
+}
+.gym-login-submit {
+    width: 100%;
+    justify-content: center;
+    margin-top: .5rem;
+    min-height: 62px;
+    font-size: 1.15rem;
+}
+.gym-login-submit span {
+    font-size: 1.8rem;
+    line-height: .6;
+}
+/* ----- Layout de instructor ----- */
+.gym-app-body {
+    margin: 0;
+    background: var(--gym-page);
+    color: var(--gym-text);
+    font-family: Inter, system-ui, sans-serif;
+}
+.gym-app-shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 245px minmax(0, 1fr);
+}
+.gym-sidebar {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 1.6rem 1.15rem;
+    background: var(--gym-navy);
+    color: #fff;
+}
+.gym-brand {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin: 0 .55rem 2rem;
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.42rem;
+    font-weight: 800;
+}
+.gym-brand .gym-icon {
+    width: 1.7rem;
+    height: 1.7rem;
+    color: #3d9cff;
+}
+.gym-brand strong {
+    color: #3d9cff;
+}
+.gym-profile {
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    padding: .9rem;
+    border: 1px solid rgba(153, 193, 235, .3);
+    border-radius: 15px;
+    background: rgba(31, 78, 123, .55);
+}
+.gym-profile-icon {
+    width: 43px;
+    height: 43px;
+    padding: .6rem;
+    border-radius: 50%;
+    background: var(--gym-blue);
+    color: #fff;
+}
+.gym-profile strong, .gym-profile span {
+    display: block;
+}
+.gym-profile strong {
+    font-size: .98rem;
+}
+.gym-profile span {
+    margin-top: .15rem;
+    color: #b9cae0;
+    font-size: .9rem;
+}
+.gym-side-nav {
+    display: grid;
+    gap: .4rem;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 2px solid rgba(159, 194, 228, .42);
+}
+.gym-nav-item, .gym-logout {
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    padding: .78rem .85rem;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: background .15s ease;
+}
+.gym-nav-item:hover, .gym-nav-item.active {
+    color: #fff;
+    background: var(--gym-blue);
+}
+.gym-nav-item .gym-icon, .gym-logout .gym-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+.gym-logout {
+    margin-top: auto;
+    padding-top: 1.15rem;
+    border-radius: 0;
+    border-top: 2px solid rgba(159, 194, 228, .42);
+}
+.gym-logout:hover {
+    color: #fff;
+    background: rgba(255,255,255,.08);
+}
+.gym-content {
+    min-width: 0;
+    padding: clamp(1.25rem, 2.5vw, 2.5rem);
+}
+.gym-page-heading {
+    margin-bottom: 1.6rem;
+}
+.gym-page-heading h1 {
+    margin: 0;
+    font-size: clamp(1.8rem, 2.5vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+.gym-page-heading p {
+    margin: .35rem 0 0;
+    color: var(--gym-muted);
+    font-size: clamp(.98rem, 1.25vw, 1.1rem);
+}
+.gym-card {
+    margin-bottom: 1.4rem;
+    padding: clamp(1.15rem, 1.8vw, 1.6rem);
+    border: 1px solid #dde6f1;
+    border-radius: 19px;
+    background: #fff;
+    box-shadow: 0 10px 24px rgba(27, 61, 108, .07);
+}
+.gym-card-heading {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    margin-bottom: 1.35rem;
+}
+.gym-card-heading h2 {
+    margin: 0;
+    font-size: clamp(1.25rem, 1.65vw, 1.65rem);
+    font-weight: 800;
+}
+.gym-card-heading p {
+    margin: .15rem 0 0;
+    color: var(--gym-muted);
+    font-size: .92rem;
+}
+.gym-heading-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #eaf2ff;
+    color: var(--gym-blue);
+}
+.gym-heading-icon .gym-icon {
+    width: 26px;
+    height: 26px;
+}
+.gym-app-body .form-label {
+    margin-bottom: .42rem;
+    color: var(--gym-text);
+    font-size: .94rem;
+    font-weight: 700;
+}
+.gym-app-body .form-control, .gym-app-body .form-select {
+    min-height: 50px;
+    border: 1.5px solid #cdd9e7;
+    border-radius: 10px;
+    background: #fbfcfe;
+    color: var(--gym-text);
+    font-size: .98rem;
+}
+.gym-app-body textarea.form-control {
+    min-height: auto;
+    padding-top: .75rem;
+    resize: vertical;
+}
+.gym-muted-label {
+    color: var(--gym-muted);
+    font-weight: 500;
+}
+.gym-primary-btn, .gym-secondary-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .55rem;
+    min-height: 48px;
+    padding: .65rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: .96rem;
+    text-decoration: none;
+}
+.gym-primary-btn {
+    background: var(--gym-green);
+    color: #fff;
+}
+.gym-primary-btn:hover {
+    background: #078749;
+    color: #fff;
+}
+.gym-secondary-btn {
+    border-color: #c7d4e3;
+    background: #f4f7fb;
+    color: #53657d;
+}
+.gym-secondary-btn:hover {
+    background: #e8eef6;
+}
+.gym-primary-btn:disabled, .gym-secondary-btn:disabled {
+    opacity: .58;
+    cursor: not-allowed;
+}
+.gym-primary-btn .gym-icon, .gym-secondary-btn .gym-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+.gym-table {
+    overflow: hidden;
+    border: 1px solid #d8e3ef;
+    border-radius: 12px;
+    color: var(--gym-text);
+    vertical-align: middle;
+    font-size: .94rem;
+}
+.gym-table > :not(caption) > * > * {
+    padding: .78rem .9rem;
+    border-color: #e0e8f0;
+}
+.gym-table thead th {
+    border-bottom: 0;
+    background: #eaf2ff;
+    color: var(--gym-text);
+    font-weight: 800;
+}
+.gym-table tbody tr:nth-child(even) > * {
+    background: #f8fbff;
+}
+.gym-strong-cell {
+    font-weight: 700;
+}
+.gym-actions {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+.gym-icon-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 37px;
+    height: 37px;
+    border: 0;
+    border-radius: 9px;
+    text-decoration: none;
+}
+.gym-icon-btn .gym-icon {
+    width: 20px;
+    height: 20px;
+}
+.gym-edit-btn {
+    background: #edf4ff;
+    color: var(--gym-blue);
+}
+.gym-delete-btn {
+    background: #ffeaec;
+    color: var(--gym-red);
+}
+.gym-icon-btn:hover {
+    filter: brightness(.95);
+    color: inherit;
+}
+.gym-media-label {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    color: #53657d;
+}
+.gym-media-label .gym-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--gym-blue);
+}
+/* ----- Ejercicios ----- */
+.gym-media-section {
+    margin: .4rem 0 1.15rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--gym-line);
+}
+.gym-media-tabs {
+    display: flex;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #f0f5fc;
+}
+.gym-media-tab {
+    display: inline-flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    min-height: 46px;
+    padding: .5rem;
+    border: 0;
+    background: transparent;
+    color: #5c6e87;
+    font-weight: 600;
+    font-size: .9rem;
+}
+.gym-media-tab.active {
+    margin: .3rem;
+    border-radius: 8px;
+    background: var(--gym-blue);
+    color: #fff;
+}
+.gym-media-tab .gym-icon {
+    width: 1.15rem;
+    height: 1.15rem;
+}
+.gym-upload-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    min-height: 82px;
+    padding: .8rem;
+    border: 1.5px solid #cdd9e7;
+    border-radius: 10px;
+    background: #fbfcfe;
+    color: var(--gym-blue);
+}
+.gym-upload-box > .gym-icon {
+    width: 42px;
+    height: 42px;
+    padding: .6rem;
+    border-radius: 10px;
+    background: #eaf2ff;
+}
+.gym-upload-box strong, .gym-upload-box span {
+    display: block;
+}
+.gym-upload-box strong {
+    color: var(--gym-text);
+    font-size: .92rem;
+}
+.gym-upload-box span {
+    margin-top: .15rem;
+    color: var(--gym-muted);
+    font-size: .78rem;
+}
+.gym-upload-box input[type=file] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+.gym-inline-password {
+    position: relative;
+}
+.gym-inline-password .form-control {
+    padding-right: 3.4rem;
+}
+.gym-inline-password .gym-password-toggle {
+    top: 50%;
+    transform: translateY(-50%);
+}
+/* ----- Rutinas de instructor y cliente ----- */
+.gym-routine-grid {
+    display: grid;
+    grid-template-columns: minmax(260px, .65fr) minmax(0, 1.35fr);
+    gap: 1.4rem;
+    align-items: start;
+}
+.gym-routine-grid .gym-card {
+    margin-bottom: 1.4rem;
+}
+.gym-plan-note {
+    display: grid;
+    gap: .45rem;
+    min-height: 145px;
+    margin-top: 1.7rem;
+    padding: 1.2rem;
+    border-radius: 13px;
+    background: #eaf2ff;
+    color: var(--gym-text);
+}
+.gym-plan-note strong {
+    color: var(--gym-blue);
+}
+.gym-plan-note span {
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+.gym-day-tabs {
+    display: flex;
+    gap: .2rem;
+    padding: .35rem;
+    border-radius: 13px;
+    background: #f0f4fa;
+}
+.gym-day-tab {
+    display: grid;
+    flex: 1;
+    place-items: center;
+    gap: .1rem;
+    min-width: 68px;
+    padding: .65rem .35rem;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #63748c;
+    text-decoration: none;
+}
+.gym-day-tab strong {
+    font-size: .92rem;
+}
+.gym-day-tab span {
+    font-size: .82rem;
+}
+.gym-day-tab.active {
+    background: var(--gym-blue);
+    color: #fff;
+}
+.gym-day-tab:hover {
+    color: inherit;
+}
+.gym-routine-day-title {
+    margin: 1.2rem 0 .7rem;
+    font-size: 1.08rem;
+    font-weight: 800;
+}
+.gym-routine-table .form-control, .gym-routine-table .form-select {
+    min-width: 66px;
+    min-height: 41px;
+    padding: .35rem .5rem;
+    font-size: .9rem;
+}
+.gym-routine-table .form-select {
+    min-width: 155px;
+}
+.gym-routine-table > :not(caption) > * > * {
+    padding: .55rem .45rem;
+}
+.gym-routine-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.gym-routine-actions span {
+    color: var(--gym-muted);
+    font-size: .9rem;
+}
+.gym-blue-btn, .gym-guide-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 45px;
+    padding: .6rem 1rem;
+    border: 0;
+    border-radius: 10px;
+    background: var(--gym-blue);
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+}
+.gym-blue-btn:hover, .gym-guide-btn:hover {
+    background: var(--gym-blue-hover);
+    color: #fff;
+}
+.gym-count-badge {
+    margin-left: auto;
+    padding: .45rem .8rem;
+    border-radius: 9px;
+    background: #eaf2ff;
+    color: var(--gym-blue);
+    font-weight: 800;
+    white-space: nowrap;
+}
+.gym-plan-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
+    gap: 1rem;
+}
+.gym-plan-card {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    min-height: 108px;
+    padding: 1rem;
+    border: 1.5px solid #d5e0ec;
+    border-radius: 14px;
+    color: var(--gym-text);
+    text-decoration: none;
+}
+.gym-plan-card:hover {
+    color: var(--gym-text);
+    border-color: #9cc0ff;
+}
+.gym-plan-card.active {
+    border: 2px solid var(--gym-blue);
+    background: #f3f7ff;
+}
+.gym-plan-card .gym-heading-icon {
+    width: 46px;
+    height: 46px;
+}
+.gym-plan-card strong, .gym-plan-card small {
+    display: block;
+}
+.gym-plan-card small {
+    margin-top: .25rem;
+    color: var(--gym-muted);
+}
+.gym-plan-card b {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    margin-left: auto;
+    border-radius: 50%;
+    background: var(--gym-blue);
+    color: #fff;
+}
+.gym-client-day-tabs {
+    margin-bottom: 1.25rem;
+}
+.gym-client-day-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: .75rem;
+}
+.gym-client-day-heading h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+.gym-client-day-heading span {
+    color: var(--gym-muted);
+}
+.gym-client-table > :not(caption) > * > * {
+    white-space: nowrap;
+}
+.gym-guide-btn {
+    min-height: 38px;
+    padding: .45rem .75rem;
+    font-size: .88rem;
+}
+.gym-guide-row > td {
+    padding: 0 !important;
+    background: #f8fbff !important;
+}
+.gym-guide-card {
+    padding: 1rem;
+}
+.gym-guide-card .gym-card-heading {
+    margin-bottom: .75rem;
+}
+.gym-guide-card .gym-card-heading h2 {
+    font-size: 1.05rem;
+}
+.gym-guide-card .guia-box {
+    margin: 0;
+    border-color: #d9e3f0;
+}
+.gym-empty-state {
+    display: grid;
+    place-items: center;
+    gap: .8rem;
+    min-height: 260px;
+    text-align: center;
+}
+.gym-empty-state h2, .gym-empty-state p {
+    margin: 0;
+}
+.gym-empty-state p {
+    color: var(--gym-muted);
+}
+/* Layout anterior, preservado para Gestión de Rutinas y Mis Rutinas. */
+.navbar-brand span {
+    letter-spacing: 0.5px;
+}
+.guia-box {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: .5rem;
+    padding: 1rem;
+    margin-top: .75rem;
+}
+.guia-img {
+    max-height: 320px;
+    border-radius: .5rem;
+}
+.dia-btn.active {
+    background: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+    font-weight: bold;
+}
+.tabla-form {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: .5rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+.detalle-row td {
+    vertical-align: middle;
+}
+@media (max-width: 991.98px) {
+    .gym-login-layout {
+        grid-template-columns: 1fr;
+    }
+    .gym-login-hero {
+        min-height: auto;
+    }
+    .gym-login-hero-content {
+        padding: 3.5rem 1.5rem;
+    }
+    .gym-login-hero h1 {
+        margin: 1.25rem 0;
+    }
+    .gym-login-hero h2, .gym-login-accent, .gym-login-hero p {
+        display: none;
+    }
+    .gym-login-panel {
+        padding: 2rem 1rem;
+    }
+    .gym-app-shell {
+        grid-template-columns: 1fr;
+    }
+    .gym-sidebar {
+        position: static;
+        min-height: auto;
+        padding: 1rem;
+    }
+    .gym-brand {
+        margin: 0 .5rem 1rem;
+    }
+    .gym-profile, .gym-logout {
+        display: none;
+    }
+    .gym-side-nav {
+        display: flex;
+        overflow-x: auto;
+        gap: .4rem;
+        margin: 0;
+        padding: .7rem 0 0;
+        border-top: 1px solid rgba(159, 194, 228, .42);
+    }
+    .gym-nav-item {
+        flex: 0 0 auto;
+        padding: .7rem .85rem;
+        font-size: .9rem;
+    }
+    .gym-nav-item .gym-icon {
+        width: 1.3rem;
+        height: 1.3rem;
+    }
+    .gym-content {
+        padding: 1.4rem 1rem;
+    }
+    .gym-routine-grid {
+        grid-template-columns: 1fr;
+    }
+    .gym-day-tabs {
+        overflow-x: auto;
+    }
+    .gym-day-tab {
+        flex: 0 0 78px;
+    }
+    .gym-plan-cards {
+        grid-template-columns: 1fr;
+    }
+}
+@media (max-width: 575.98px) {
+    .gym-login-card {
+        border-radius: 24px;
+        padding: 2rem 1.35rem;
+    }
+    .gym-input-wrap .form-control {
+        height: 64px;
+        padding-left: 3.6rem;
+        font-size: 1rem;
+    }
+    .gym-input-wrap > svg {
+        left: 1rem;
+        width: 24px;
+        height: 24px;
+    }
+    .gym-login-submit {
+        min-height: 62px;
+    }
+    .gym-page-heading {
+        margin-bottom: 1.4rem;
+    }
+    .gym-card {
+        padding: 1.15rem;
+        border-radius: 18px;
+    }
+    .gym-card-heading {
+        align-items: flex-start;
+        margin-bottom: 1.3rem;
+    }
+    .gym-heading-icon {
+        width: 47px;
+        height: 47px;
+    }
+    .gym-heading-icon .gym-icon {
+        width: 26px;
+        height: 26px;
+    }
+    .gym-card-heading h2 {
+        font-size: 1.3rem;
+    }
+    .gym-card-heading p {
+        font-size: .9rem;
+    }
+    .gym-table > :not(caption) > * > * {
+        padding: .75rem;
+        white-space: nowrap;
+    }
+    .gym-media-tabs {
+        flex-wrap: wrap;
+    }
+    .gym-media-tab {
+        flex-basis: 100%;
+    }
+    .gym-actions {
+        min-width: 105px;
+    }
+}

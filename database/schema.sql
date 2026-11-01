@@ -52,16 +52,13 @@ CREATE TABLE EJERCICIO (
 CREATE TABLE RUTINA (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_plan VARCHAR(120) NOT NULL,
-    fecha_inicio DATE NOT NULL,
-    fecha_fin DATE NOT NULL,
     id_instructor INT NOT NULL,
     id_cliente INT NOT NULL,
     CONSTRAINT fk_rutina_instructor FOREIGN KEY (id_instructor)
         REFERENCES INSTRUCTOR(id_usuario) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT fk_rutina_cliente FOREIGN KEY (id_cliente)
         REFERENCES CLIENTE(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT chk_rutina_fechas CHECK (fecha_fin >= fecha_inicio),
-    INDEX idx_rutina_cliente_vigencia (id_cliente, fecha_inicio, fecha_fin),
+    INDEX idx_rutina_cliente (id_cliente),
     INDEX idx_rutina_instructor (id_instructor)
 ) ENGINE=InnoDB;
 

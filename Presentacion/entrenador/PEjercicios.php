@@ -59,81 +59,97 @@ class PEjercicios {
             echo '<div class="alert alert-warning">Debe crear categorías antes de registrar ejercicios</div>';
         }
         ?>
-        <div class="tabla-form">
+        <section class="gym-card gym-form-card">
+            <div class="gym-card-heading">
+                <span class="gym-heading-icon"><?php echo iconoGym('exercise'); ?></span>
+                <div><h2>Registrar ejercicio</h2><p>Completa la información técnica y el recurso multimedia del ejercicio</p></div>
+            </div>
             <form method="post" action="index.php?r=ejercicios" enctype="multipart/form-data">
                 <input type="hidden" name="id" id="f-id" value="">
                 <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Nombre del Ejercicio *</label>
-                        <input type="text" name="nombre" id="f-nombre" class="form-control" required <?php echo $sinCats ? 'disabled' : ''; ?>>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Nombre *</label>
+                        <input type="text" name="nombre" id="f-nombre" class="form-control" placeholder="Ej. Press de banca" required <?php echo $sinCats ? 'disabled' : ''; ?>>
                     </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Categoría Muscular *</label>
                         <select name="id_categoria" id="f-id_categoria" class="form-select" required <?php echo $sinCats ? 'disabled' : ''; ?>>
-                            <option value="">Seleccione...</option>
+                            <option value="">Seleccionar categoría</option>
                             <?php foreach ($cats as $c): ?>
                                 <option value="<?php echo $c['id']; ?>"><?php echo htmlspecialchars($c['nombre']); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Tipo de multimedia *</label>
-                        <select name="tipo" id="f-tipo" class="form-select" <?php echo $sinCats ? 'disabled' : ''; ?>>
-                            <option value="IMAGEN">Subir Archivo / Imagen</option>
-                            <option value="VIDEO_URL">Enlace URL de Video</option>
-                            <option value="IFRAME_HTML">Código IFRAME_HTML</option>
-                        </select>
-                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Instrucciones / Técnica</label>
-                    <textarea name="descripcion" id="f-descripcion" class="form-control" rows="2"></textarea>
+                    <textarea name="descripcion" id="f-descripcion" class="form-control" rows="3" placeholder="Instrucciones para realizar el ejercicio, técnica y recomendaciones"></textarea>
                 </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3" id="w-archivo">
-                        <label class="form-label">Archivo (jpg/png/webp/mp4/webm, máx 16 MB)</label>
-                        <input type="file" name="archivo" class="form-control" accept=".jpg,.jpeg,.png,.webp,.mp4,.webm">
+                <div class="gym-media-section">
+                    <div class="row align-items-end">
+                        <div class="col-lg-6 mb-3">
+                            <label class="form-label">Tipo de multimedia</label>
+                            <select name="tipo" id="f-tipo" class="visually-hidden" <?php echo $sinCats ? 'disabled' : ''; ?>>
+                                <option value="IMAGEN">Imagen</option>
+                                <option value="VIDEO_URL">URL de video</option>
+                                <option value="IFRAME_HTML">Iframe HTML</option>
+                            </select>
+                            <div class="gym-media-tabs" role="group" aria-label="Tipo de multimedia">
+                                <button type="button" class="gym-media-tab active" data-media-type="IMAGEN" <?php echo $sinCats ? 'disabled' : ''; ?>><?php echo iconoGym('image'); ?>Imagen</button>
+                                <button type="button" class="gym-media-tab" data-media-type="VIDEO_URL" <?php echo $sinCats ? 'disabled' : ''; ?>>▣ URL de video</button>
+                                <button type="button" class="gym-media-tab" data-media-type="IFRAME_HTML" <?php echo $sinCats ? 'disabled' : ''; ?>>&lt;/&gt; Iframe HTML</button>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <label class="form-label">Recurso multimedia</label>
+                            <div id="w-archivo" class="gym-upload-box">
+                                <?php echo iconoGym('image'); ?>
+                                <div><strong>Seleccionar imagen del ejercicio</strong><span>JPG, PNG, WEBP, MP4 o WEBM · Máx. 16 MB</span></div>
+                                <input type="file" name="archivo" class="form-control" accept=".jpg,.jpeg,.png,.webp,.mp4,.webm">
+                            </div>
+                            <div id="w-texto" style="display:none">
+                                <label class="visually-hidden" id="lbl-texto">URL del video</label>
+                                <input type="text" name="texto" id="f-texto" class="form-control" placeholder="https://...">
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3" id="w-texto" style="display:none">
-                        <label class="form-label" id="lbl-texto">URL del video</label>
-                        <input type="text" name="texto" id="f-texto" class="form-control">
-                    </div>
-                    <div class="col-md-12 mb-3 d-flex gap-2">
-                        <button type="submit" id="btn-save" data-orig="Guardar Ejercicio" data-alt="Actualizar Ejercicio" class="btn btn-success" <?php echo $sinCats ? 'disabled' : ''; ?>>Guardar Ejercicio</button>
-                        <button type="button" id="btn-cancel" class="btn btn-secondary" style="display:none">Cancelar</button>
-                    </div>
+                </div>
+                <div class="d-flex flex-wrap gap-3 pt-2">
+                    <button type="submit" id="btn-save" data-orig="Guardar" data-alt="Actualizar" class="gym-primary-btn" <?php echo $sinCats ? 'disabled' : ''; ?>><?php echo iconoGym('save'); ?><span>Guardar</span></button>
+                    <button type="button" id="btn-cancel" class="gym-secondary-btn"><?php echo iconoGym('clear'); ?><span>Limpiar</span></button>
                 </div>
             </form>
-        </div>
-        <table class="table table-striped table-bordered bg-white">
-            <thead class="table-dark">
-                <tr><th>Nombre</th><th>Categoría</th><th>Tipo</th><th>Acciones</th></tr>
-            </thead>
+        </section>
+        <section class="gym-card gym-table-card">
+            <div class="gym-card-heading"><span class="gym-heading-icon"><?php echo iconoGym('category'); ?></span><div><h2>Banco de ejercicios</h2><p>Consulta, edita o elimina los ejercicios existentes</p></div></div>
+            <div class="table-responsive"><table class="table gym-table mb-0">
+            <thead><tr><th>#</th><th>Ejercicio</th><th>Categoría</th><th>Multimedia</th><th>Acciones</th></tr></thead>
             <tbody>
                 <?php foreach ($lista as $e): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($e['nombre']); ?></td>
+                        <td><?php echo str_pad((string)$e['id'], 2, '0', STR_PAD_LEFT); ?></td>
+                        <td class="gym-strong-cell"><?php echo htmlspecialchars($e['nombre']); ?></td>
                         <td><?php echo htmlspecialchars($e['categoria']); ?></td>
-                        <td><span class="badge bg-secondary"><?php echo $e['tipo_multimedia']; ?></span></td>
-                        <td>
-                            <button class="btn btn-sm btn-primary"
+                        <td><span class="gym-media-label"><?php echo $e['tipo_multimedia'] === 'IMAGEN' ? iconoGym('image') : '▣'; ?><?php echo htmlspecialchars($e['tipo_multimedia'] === 'VIDEO_URL' ? 'URL de video' : ($e['tipo_multimedia'] === 'IFRAME_HTML' ? 'Iframe HTML' : 'Imagen')); ?></span></td>
+                        <td class="gym-actions">
+                            <button class="gym-icon-btn gym-edit-btn" aria-label="Editar ejercicio"
                                 data-edit="<?php echo $e['id']; ?>"
                                 data-nombre="<?php echo htmlspecialchars($e['nombre'], ENT_QUOTES); ?>"
                                 data-id_categoria="<?php echo $e['id_categoria']; ?>"
                                 data-descripcion="<?php echo htmlspecialchars($e['descripcion'] ?? '', ENT_QUOTES); ?>"
                                 data-tipo="<?php echo $e['tipo_multimedia']; ?>"
-                                data-texto="<?php echo $e['tipo_multimedia'] === 'IMAGEN' ? '' : htmlspecialchars($e['url'] ?? '', ENT_QUOTES); ?>">Editar</button>
-                            <a class="btn btn-sm btn-danger"
+                                data-texto="<?php echo $e['tipo_multimedia'] === 'IMAGEN' ? '' : htmlspecialchars($e['url'] ?? '', ENT_QUOTES); ?>"><?php echo iconoGym('edit'); ?></button>
+                            <a class="gym-icon-btn gym-delete-btn" aria-label="Eliminar ejercicio"
                                 href="index.php?r=ejercicios&del=<?php echo $e['id']; ?>"
-                                onclick="return confirm('¿Eliminar este ejercicio?')">Eliminar</a>
+                                onclick="return confirm('¿Eliminar este ejercicio?')"><?php echo iconoGym('delete'); ?></a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
                 <?php if (count($lista) === 0): ?>
-                    <tr><td colspan="4" class="text-center">Sin ejercicios registrados</td></tr>
+                    <tr><td colspan="5" class="text-center">Sin ejercicios registrados</td></tr>
                 <?php endif; ?>
-            </tbody>
-        </table>
+            </tbody></table></div>
+        </section>
         <?php
         mostrarFooter();
     }

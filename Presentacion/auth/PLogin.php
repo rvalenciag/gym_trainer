@@ -33,41 +33,58 @@ class PLogin {
         <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>Iniciar Sesión - Gym Instructor</title>
+            <title>Iniciar Sesión - Gym Trainer</title>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
             <link href="Presentacion/assets/css/app.css" rel="stylesheet">
         </head>
-        <body class="bg-light">
-            <div class="container">
-                <div class="row justify-content-center mt-5">
-                    <div class="col-md-5">
-                        <div class="card shadow">
-                            <div class="card-header bg-dark text-white text-center">
-                                <h4 class="mb-0"><span class="text-success">Gym</span> Instructor</h4>
-                            </div>
-                            <div class="card-body">
-                                <?php if (isset($_GET['fin'])): ?>
-                                    <div class="alert alert-info">Sesión finalizada correctamente</div>
-                                <?php endif; ?>
-                                <?php if ($error !== ''): ?>
-                                    <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
-                                <?php endif; ?>
-                                <form method="post" action="index.php?r=login">
-                                    <div class="mb-3">
-                                        <label class="form-label">Correo Electrónico</label>
-                                        <input type="email" name="correo" class="form-control" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Contraseña</label>
-                                        <input type="password" name="contrasena" class="form-control" required>
-                                    </div>
-                                    <button class="btn btn-success w-100" type="submit">Ingresar</button>
-                                </form>
-                            </div>
+        <body class="gym-login-body">
+            <main class="gym-login-layout">
+                <section class="gym-login-hero" aria-label="Gym Trainer">
+                    <div class="gym-login-hero-content">
+                        <div class="gym-login-brand-mark" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 9v6m3-9v12m3-15v18m3-12v6m3-9v12m3-9v6"/><path d="M2 11h2m12 0h2M2 13h2m12 0h2"/></svg>
                         </div>
+                        <h1>Gym <strong>Trainer</strong></h1>
+                        <h2>Sistema para<br>Instructor de Gimnasio</h2>
+                        <span class="gym-login-accent"></span>
+                        <p>Organiza y consulta tus entrenamientos<br>en un solo lugar.</p>
                     </div>
-                </div>
-            </div>
+                </section>
+                <section class="gym-login-panel">
+                    <div class="gym-login-card">
+                        <div class="gym-login-user-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.7-3.3 3.1-5 7-5s6.3 1.7 7 5"/></svg>
+                        </div>
+                        <h2>Iniciar Sesión</h2>
+                        <p>Accede a tu cuenta para continuar</p>
+                        <?php if (isset($_GET['fin'])): ?>
+                            <div class="alert alert-info">Sesión finalizada correctamente</div>
+                        <?php endif; ?>
+                        <?php if ($error !== ''): ?>
+                            <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+                        <?php endif; ?>
+                        <form method="post" action="index.php?r=login" class="gym-login-form">
+                            <label class="visually-hidden" for="login-correo">Correo electrónico</label>
+                            <div class="gym-input-wrap">
+                                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>
+                                <input id="login-correo" type="email" name="correo" class="form-control" placeholder="Correo electrónico" autocomplete="email" required>
+                            </div>
+                            <label class="visually-hidden" for="login-contrasena">Contraseña</label>
+                            <div class="gym-input-wrap">
+                                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                                <input id="login-contrasena" type="password" name="contrasena" class="form-control" placeholder="Contraseña" autocomplete="current-password" required>
+                                <button type="button" class="gym-password-toggle" data-password-toggle="login-contrasena" aria-label="Mostrar contraseña">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/><path d="M4 4 20 20"/></svg>
+                                </button>
+                            </div>
+                            <button class="gym-primary-btn gym-login-submit" type="submit">
+                                <span aria-hidden="true">→</span> Ingresar
+                            </button>
+                        </form>
+                    </div>
+                </section>
+            </main>
+            <script src="Presentacion/assets/js/app.js"></script>
         </body>
         </html>
         <?php
