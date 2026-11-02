@@ -183,3 +183,7 @@ Luego ejecuta el seed:
 
 ```bash
 mariadb -h 127.0.0.1 -u gym_user -p gym_db < database/seed.sql
+
+Añade los datos de ejemplo:
+
+mariadb -h 127.0.0.1 -u gym_user -p gym_db < database/seed_demo.sql
