@@ -3,7 +3,8 @@
 // $e: fila con descripcion, tipo_multimedia, url.
 defined('APP') || exit('Acceso no permitido');
 
-function mostrarGuia($e) {
+function mostrarGuia($e)
+{
     echo '<div class="guia-box">';
     echo '    <p class="mb-2"><strong>Instrucciones:</strong><br>' .
         nl2br(htmlspecialchars($e['descripcion'] ?? 'Sin instrucciones')) . '</p>';

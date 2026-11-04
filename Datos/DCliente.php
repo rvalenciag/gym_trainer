@@ -2,27 +2,31 @@
 // DCliente: espejo de CLIENTE + JOIN con USUARIO (CU05 crea/lee ambas juntas).
 require_once __DIR__ . '/Conexion.php';
 
-class DCliente {
+class DCliente
+{
     private $pdo;
     // Atributos espejo de CLIENTE (+ datos de USUARIO que viajan juntos):
     private $id_usuario;
     private $observacion;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->pdo = Conexion::get();
     }
 
-    public function listarConUsuario() {
+    public function listarConUsuario()
+    {
         return $this->pdo->query(
             'SELECT U.id, U.nombre, U.correo, U.telefono, C.observacion FROM CLIENTE C ' .
-            'JOIN USUARIO U ON U.id = C.id_usuario ORDER BY U.id'
+                'JOIN USUARIO U ON U.id = C.id_usuario ORDER BY U.id'
         )->fetchAll();
     }
 
-    public function obtenerConUsuario($id) {
+    public function obtenerConUsuario($id)
+    {
         $st = $this->pdo->prepare(
             'SELECT U.id, U.nombre, U.correo, U.telefono, C.observacion FROM CLIENTE C ' .
-            'JOIN USUARIO U ON U.id = C.id_usuario WHERE U.id = ?'
+                'JOIN USUARIO U ON U.id = C.id_usuario WHERE U.id = ?'
         );
         $st->execute([$id]);
         $f = $st->fetch();
@@ -30,7 +34,8 @@ class DCliente {
     }
 
     // Alta en transacción: USUARIO (rol CLIENTE) + perfil CLIENTE. Todo o nada.
-    public function crearConUsuario($nombre, $correo, $telefono, $hash, $observacion) {
+    public function crearConUsuario($nombre, $correo, $telefono, $hash, $observacion)
+    {
         $this->pdo->beginTransaction();
         try {
             $st = $this->pdo->prepare(
@@ -49,7 +54,8 @@ class DCliente {
     }
 
     // Edición en transacción: datos de USUARIO + observaciones de CLIENTE.
-    public function actualizarCompleto($id, $nombre, $correo, $telefono, $observacion) {
+    public function actualizarCompleto($id, $nombre, $correo, $telefono, $observacion)
+    {
         $this->pdo->beginTransaction();
         try {
             $st = $this->pdo->prepare(
@@ -67,7 +73,8 @@ class DCliente {
     }
 
     // Borrado físico en cascada: basta borrar USUARIO (CASCADE arrastra CLIENTE→RUTINA→DETALLE).
-    public function eliminarTodo($id) {
+    public function eliminarTodo($id)
+    {
         $st = $this->pdo->prepare('DELETE FROM USUARIO WHERE id = ?');
         return $st->execute([$id]);
     }

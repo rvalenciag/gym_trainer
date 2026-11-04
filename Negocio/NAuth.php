@@ -3,8 +3,10 @@
 // Devuelve ['ok'=>bool, 'user'=>array|'msg'=>string] y P maneja la sesión.
 require_once __DIR__ . '/../Datos/DUsuario.php';
 
-class NAuth {
-    public function verificar($correo, $clave) {
+class NAuth
+{
+    public function verificar($correo, $clave)
+    {
         $correo = trim($correo);
         if ($correo === '' || $clave === '') {
             return ['ok' => false, 'msg' => 'Por favor, ingrese su correo y contraseña'];

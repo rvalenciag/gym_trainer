@@ -3,10 +3,12 @@
 // Es la clase "Bd" de los diagramas. Solo la capa Datos la usa.
 require_once __DIR__ . '/../config/database.php';
 
-class Conexion {
+class Conexion
+{
     private static $pdo = null;
 
-    public static function get() {
+    public static function get()
+    {
         if (self::$pdo === null) {
             $dsn = 'mysql:host=' . DB_HOST . ';port=' . DB_PORT . ';dbname=' . DB_NAME . ';charset=utf8mb4';
             self::$pdo = new PDO($dsn, DB_USER, DB_PASS, [

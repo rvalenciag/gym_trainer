@@ -5,38 +5,47 @@ require_once __DIR__ . '/../Datos/DDetalleRutina.php';
 require_once __DIR__ . '/../Datos/DCliente.php';
 require_once __DIR__ . '/../Datos/DEjercicio.php';
 
-class NRutina {
-    public function listar() {
+class NRutina
+{
+    public function listar()
+    {
         return (new DRutina())->listarConCliente();
     }
 
-    public function listarPorCliente($idCliente) {
+    public function listarPorCliente($idCliente)
+    {
         return (new DRutina())->listarPorCliente((int)$idCliente);
     }
 
-    public function obtenerCabecera($id) {
+    public function obtenerCabecera($id)
+    {
         return (new DRutina())->obtenerCabecera((int)$id);
     }
 
-    public function listarDetalles($idRutina) {
+    public function listarDetalles($idRutina)
+    {
         return (new DDetalleRutina())->listarPorRutina((int)$idRutina);
     }
 
-    private function existeRutina($id) {
+    private function existeRutina($id)
+    {
         return (new DRutina())->obtenerCabecera((int)$id) !== null;
     }
 
-    private function tieneDetalle($dets) {
+    private function tieneDetalle($dets)
+    {
         return is_array($dets) && count($dets) > 0;
     }
 
-    private function filaCompleta($d) {
+    private function filaCompleta($d)
+    {
         return (int)($d['dia'] ?? 0) >= 1 && (int)($d['dia'] ?? 0) <= 7
             && (int)($d['ejercicio'] ?? 0) > 0 && (int)($d['series'] ?? 0) > 0
             && trim((string)($d['repeticiones'] ?? '')) !== '';
     }
 
-    private function validar($idInstructor, $idCliente, $nombre, $dets) {
+    private function validar($idInstructor, $idCliente, $nombre, $dets)
+    {
         $errores = [];
         $nombre = trim($nombre);
         if ((int)$idCliente <= 0 || $nombre === '') {
@@ -79,7 +88,8 @@ class NRutina {
         return [$errores, $cabecera, $limpios];
     }
 
-    public function crear($idInstructor, $idCliente, $nombre, $dets) {
+    public function crear($idInstructor, $idCliente, $nombre, $dets)
+    {
         list($errores, $cab, $limpios) = $this->validar($idInstructor, $idCliente, $nombre, $dets);
         if (count($errores) > 0) {
             return ['ok' => false, 'msg' => $errores[0]];
@@ -88,7 +98,6 @@ class NRutina {
         try {
             $dr->iniciarTransaccion();
             $id = $dr->crearCabecera($cab);
-            error_log("DENTRO");
             $dd = new DDetalleRutina();
             foreach ($limpios as $d) {
                 $dd->insertar($id, $d);
@@ -101,7 +110,8 @@ class NRutina {
         }
     }
 
-    public function actualizar($id, $idCliente, $nombre, $dets, $idInstructor = 0) {
+    public function actualizar($id, $idCliente, $nombre, $dets, $idInstructor = 0)
+    {
         if (!$this->existeRutina($id)) {
             return ['ok' => false, 'msg' => 'La rutina no existe'];
         }
@@ -122,12 +132,14 @@ class NRutina {
         }
     }
 
-    public function eliminar($id) {
+    public function eliminar($id)
+    {
         $ok = (new DRutina())->eliminar((int)$id);
         return ['ok' => $ok, 'msg' => $ok ? 'Rutina eliminada del sistema' : 'No se pudo eliminar'];
     }
 
-    public function rutinaDelDia($idCliente, $idRutina, $dia) {
+    public function rutinaDelDia($idCliente, $idRutina, $dia)
+    {
         $rutina = (new DRutina())->obtenerDeCliente((int)$idRutina, (int)$idCliente);
         if ($rutina === null) {
             return ['rutina' => null, 'detalles' => []];

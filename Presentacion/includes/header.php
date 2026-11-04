@@ -2,11 +2,13 @@
 // Layout común (capa P): header + menú por rol + flash. Acceso solo vía index.php.
 defined('APP') || exit('Acceso no permitido');
 
-function flash($tipo, $texto) {
+function flash($tipo, $texto)
+{
     $_SESSION['flash'] = ['t' => $tipo, 'm' => $texto];
 }
 
-function iconoGym($nombre, $clase = '') {
+function iconoGym($nombre, $clase = '')
+{
     $iconos = [
         'logo' => '<path d="M4 9v6m3-9v12m3-15v18m3-12v6m3-9v12m3-9v6"/><path d="M2 11h2m12 0h2M2 13h2m12 0h2"/>',
         'user' => '<circle cx="12" cy="8" r="3.5"/><path d="M5 20c.7-3.3 3.1-5 7-5s6.3 1.7 7 5"/>',
@@ -27,7 +29,8 @@ function iconoGym($nombre, $clase = '') {
         . 'aria-hidden="true">' . $trazo . '</svg>';
 }
 
-function mostrarHeader($titulo) {
+function mostrarHeader($titulo)
+{
     $rol = $_SESSION['rol'] ?? '';
     $nombre = htmlspecialchars($_SESSION['nombre'] ?? '');
     $r = $_GET['r'] ?? '';
@@ -130,7 +133,8 @@ function mostrarHeader($titulo) {
     echo '        <h2 class="mb-4">' . htmlspecialchars($titulo) . '</h2>';
 }
 
-function mostrarFooter() {
+function mostrarFooter()
+{
     if (!empty($GLOBALS['gym_layout_moderno'])) {
         echo '</main></div>';
         echo '<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>';

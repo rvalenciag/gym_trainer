@@ -2,12 +2,15 @@
 // NCategoria: reglas del catálogo de grupos musculares (CU03).
 require_once __DIR__ . '/../Datos/DCategoria.php';
 
-class NCategoria {
-    public function listar() {
+class NCategoria
+{
+    public function listar()
+    {
         return (new DCategoria())->listar();
     }
 
-    public function guardar($nombre, $descripcion) {
+    public function guardar($nombre, $descripcion)
+    {
         $nombre = trim($nombre);
         if ($nombre === '') {
             return ['ok' => false, 'msg' => 'El nombre de la categoría es obligatorio'];
@@ -22,7 +25,8 @@ class NCategoria {
             : ['ok' => false, 'msg' => 'No se pudo registrar la categoría'];
     }
 
-    public function actualizar($id, $nombre, $descripcion) {
+    public function actualizar($id, $nombre, $descripcion)
+    {
         $nombre = trim($nombre);
         if ($nombre === '') {
             return ['ok' => false, 'msg' => 'El nombre de la categoría es obligatorio'];
@@ -35,7 +39,8 @@ class NCategoria {
         return ['ok' => $ok, 'msg' => $ok ? 'Categoría actualizada correctamente' : 'No se pudo actualizar'];
     }
 
-    public function eliminar($id) {
+    public function eliminar($id)
+    {
         $d = new DCategoria();
         if ($d->tieneEjercicios((int)$id)) {
             return ['ok' => false, 'msg' => 'No se puede eliminar la categoría porque tiene ejercicios vinculados'];

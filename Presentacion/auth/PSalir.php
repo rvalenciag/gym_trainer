@@ -2,8 +2,10 @@
 // PSalir: cierre de sesión (CU02). Acción pura, sin vista: destruye y vuelve al login.
 defined('APP') || exit('Acceso no permitido');
 
-class PSalir {
-    public function cerrar() {
+class PSalir
+{
+    public function cerrar()
+    {
         $_SESSION = [];
         if (ini_get('session.use_cookies')) {
             $p = session_get_cookie_params();
