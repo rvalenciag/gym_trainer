@@ -11,7 +11,7 @@ class PCategorias
     private ?string $descripcion = null;
     private array $categorias = [];
 
-    public function listar()
+    private function listar()
     {
         return (new NCategoria())->listar();
     }

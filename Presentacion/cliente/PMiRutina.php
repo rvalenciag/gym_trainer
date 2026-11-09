@@ -34,12 +34,12 @@ class PMiRutina
     private ?array $rutina = null;
     private array $detallesRutina = [];
 
-    public function listarRutinas($idCliente)
+    private function listarRutinas($idCliente)
     {
         return (new NRutina())->listarPorCliente((int)$idCliente);
     }
 
-    public function verRutina($idCliente, $idRutina, $dia)
+    private function verRutina($idCliente, $idRutina, $dia)
     {
         return (new NRutina())->rutinaDelDia((int)$idCliente, (int)$idRutina, (int)$dia);
     }

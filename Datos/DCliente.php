@@ -1,81 +1,87 @@
 <?php
-// DCliente: espejo de CLIENTE + JOIN con USUARIO (CU05 crea/lee ambas juntas).
+// DCliente: acceso a la tabla CLIENTE y consultas con su usuario asociado.
 require_once __DIR__ . '/Conexion.php';
 
 class DCliente
 {
     private $pdo;
-    // Atributos espejo de CLIENTE (+ datos de USUARIO que viajan juntos):
-    private $id_usuario;
+    private $idUsuario;
     private $observacion;
 
-    public function __construct()
+    public function __construct($datos = [])
     {
         $this->pdo = Conexion::get();
+        $this->idUsuario = $datos['id_usuario'] ?? null;
+        $this->observacion = $datos['observacion'] ?? null;
     }
 
     public function listarConUsuario()
     {
         return $this->pdo->query(
-            'SELECT U.id, U.nombre, U.correo, U.telefono, C.observacion FROM CLIENTE C ' .
-                'JOIN USUARIO U ON U.id = C.id_usuario ORDER BY U.id'
+            'SELECT U.id, U.nombre, U.correo, U.telefono, C.observacion
+             FROM CLIENTE C
+             INNER JOIN USUARIO U ON U.id = C.id_usuario
+             ORDER BY U.id'
         )->fetchAll();
     }
 
-    public function obtenerConUsuario($id)
+    public function obtenerConUsuario()
     {
         $st = $this->pdo->prepare(
-            'SELECT U.id, U.nombre, U.correo, U.telefono, C.observacion FROM CLIENTE C ' .
-                'JOIN USUARIO U ON U.id = C.id_usuario WHERE U.id = ?'
+            'SELECT U.id, U.nombre, U.correo, U.telefono, C.observacion
+             FROM CLIENTE C
+             INNER JOIN USUARIO U ON U.id = C.id_usuario
+             WHERE U.id = ?'
         );
-        $st->execute([$id]);
-        $f = $st->fetch();
-        return $f === false ? null : $f;
-    }
+        $st->execute([(int) $this->idUsuario]);
+        $fila = $st->fetch();
 
-    // Alta en transacción: USUARIO (rol CLIENTE) + perfil CLIENTE. Todo o nada.
-    public function crearConUsuario($nombre, $correo, $telefono, $hash, $observacion)
-    {
-        $this->pdo->beginTransaction();
-        try {
-            $st = $this->pdo->prepare(
-                "INSERT INTO USUARIO(nombre, correo, telefono, contrasena, rol) VALUES(?, ?, ?, ?, 'CLIENTE')"
-            );
-            $st->execute([$nombre, $correo, $telefono, $hash]);
-            $id = (int)$this->pdo->lastInsertId();
-            $st = $this->pdo->prepare('INSERT INTO CLIENTE(id_usuario, observacion) VALUES(?, ?)');
-            $st->execute([$id, $observacion]);
-            $this->pdo->commit();
-            return $id;
-        } catch (Exception $e) {
-            $this->pdo->rollBack();
-            return 0;
+        if ($fila === false) {
+            return null;
         }
+
+        $this->cargarDatos($fila);
+        return $this->aArray($fila);
     }
 
-    // Edición en transacción: datos de USUARIO + observaciones de CLIENTE.
-    public function actualizarCompleto($id, $nombre, $correo, $telefono, $observacion)
+    public function crearPerfil()
     {
-        $this->pdo->beginTransaction();
-        try {
-            $st = $this->pdo->prepare(
-                'UPDATE USUARIO SET nombre = ?, correo = ?, telefono = ? WHERE id = ?'
-            );
-            $st->execute([$nombre, $correo, $telefono, $id]);
-            $st = $this->pdo->prepare('UPDATE CLIENTE SET observacion = ? WHERE id_usuario = ?');
-            $st->execute([$observacion, $id]);
-            $this->pdo->commit();
-            return true;
-        } catch (Exception $e) {
-            $this->pdo->rollBack();
-            return false;
-        }
+        $st = $this->pdo->prepare(
+            'INSERT INTO CLIENTE (id_usuario, observacion) VALUES (?, ?)'
+        );
+
+        return $st->execute([
+            (int) $this->idUsuario,
+            $this->observacion,
+        ]);
     }
 
-    // Borrado físico en cascada: basta borrar USUARIO (CASCADE arrastra CLIENTE→RUTINA→DETALLE).
-    public function eliminarTodo($id)
+    public function actualizarPerfil()
     {
-        $st = $this->pdo->prepare('DELETE FROM USUARIO WHERE id = ?');
-        return $st->execute([$id]);
+        $st = $this->pdo->prepare(
+            'UPDATE CLIENTE SET observacion = ? WHERE id_usuario = ?'
+        );
+
+        return $st->execute([
+            $this->observacion,
+            (int) $this->idUsuario,
+        ]);
+    }
+
+    private function cargarDatos($fila)
+    {
+        $this->idUsuario = (int) $fila['id'];
+        $this->observacion = $fila['observacion'];
+    }
+
+    private function aArray($fila)
+    {
+        return [
+            'id' => $this->idUsuario,
+            'nombre' => $fila['nombre'],
+            'correo' => $fila['correo'],
+            'telefono' => $fila['telefono'],
+            'observacion' => $this->observacion,
+        ];
     }
 }

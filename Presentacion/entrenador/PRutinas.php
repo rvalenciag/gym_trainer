@@ -29,15 +29,15 @@ class PRutinas
     private array $rutinas = [];
     private bool $sinDatosBase = false;
 
-    public function listar()
+    private function listar()
     {
         return (new NRutina())->listar();
     }
-    public function listarClientes()
+    private function listarClientes()
     {
         return (new NCliente())->listar();
     }
-    public function listarEjercicios()
+    private function listarEjercicios()
     {
         return (new NEjercicio())->listar();
     }

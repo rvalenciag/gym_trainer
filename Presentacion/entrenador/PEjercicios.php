@@ -20,12 +20,12 @@ class PEjercicios
     private array $ejercicios = [];
     private bool $sinCategorias = false;
 
-    public function listar()
+    private function listar()
     {
         return (new NEjercicio())->listar();
     }
 
-    public function listarCategorias()
+    private function listarCategorias()
     {
         return (new NCategoria())->listar(); // desacoplado: solo lectura, sin reglas de por medio
     }

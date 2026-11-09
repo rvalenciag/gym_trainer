@@ -15,7 +15,7 @@ class PClientes
     private ?string $observacion = null;
     private array $clientes = [];
 
-    public function listar()
+    private function listar()
     {
         return (new NCliente())->listar();
     }

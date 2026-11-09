@@ -1,72 +1,117 @@
 <?php
-// DCategoria: espejo de la tabla CATEGORIA (CU03).
+// DCategoria: acceso a la tabla CATEGORIA.
 require_once __DIR__ . '/Conexion.php';
 
 class DCategoria
 {
     private $pdo;
-    // Atributos espejo de CATEGORIA:
     private $id;
     private $nombre;
     private $descripcion;
 
-    public function __construct()
+    public function __construct($datos = [])
     {
         $this->pdo = Conexion::get();
+        $this->id = $datos['id'] ?? null;
+        $this->nombre = $datos['nombre'] ?? null;
+        $this->descripcion = $datos['descripcion'] ?? null;
     }
 
     public function listar()
     {
-        return $this->pdo->query('SELECT * FROM CATEGORIA ORDER BY id')->fetchAll();
+        return $this->pdo->query(
+            'SELECT id, nombre, descripcion FROM CATEGORIA ORDER BY id'
+        )->fetchAll();
     }
 
-    public function obtenerPorId($id)
+    public function obtenerPorId()
     {
-        $st = $this->pdo->prepare('SELECT * FROM CATEGORIA WHERE id = ?');
-        $st->execute([$id]);
-        $f = $st->fetch();
-        return $f === false ? null : $f;
+        $st = $this->pdo->prepare(
+            'SELECT id, nombre, descripcion FROM CATEGORIA WHERE id = ?'
+        );
+        $st->execute([(int) $this->id]);
+        $fila = $st->fetch();
+
+        if ($fila === false) {
+            return null;
+        }
+
+        $this->cargarDatos($fila);
+        return $this->aArray();
     }
 
-    public function crear($nombre, $descripcion)
+    public function crear()
     {
-        $st = $this->pdo->prepare('INSERT INTO CATEGORIA(nombre, descripcion) VALUES(?, ?)');
-        $st->execute([$nombre, $descripcion]);
-        return (int)$this->pdo->lastInsertId();
+        $st = $this->pdo->prepare(
+            'INSERT INTO CATEGORIA (nombre, descripcion) VALUES (?, ?)'
+        );
+        $st->execute([$this->nombre, $this->descripcion]);
+
+        $this->id = (int) $this->pdo->lastInsertId();
+        return $this->id;
     }
 
-    public function actualizar($id, $nombre, $descripcion)
+    public function actualizar()
     {
-        $st = $this->pdo->prepare('UPDATE CATEGORIA SET nombre = ?, descripcion = ? WHERE id = ?');
-        return $st->execute([$nombre, $descripcion, $id]);
+        $st = $this->pdo->prepare(
+            'UPDATE CATEGORIA SET nombre = ?, descripcion = ? WHERE id = ?'
+        );
+
+        return $st->execute([
+            $this->nombre,
+            $this->descripcion,
+            (int) $this->id,
+        ]);
     }
 
-    public function eliminar($id)
+    public function eliminar()
     {
         $st = $this->pdo->prepare('DELETE FROM CATEGORIA WHERE id = ?');
-        return $st->execute([$id]);
+        return $st->execute([(int) $this->id]);
     }
 
-    // $excluirId: al editar, la propia categoría no cuenta como duplicada.
-    public function existeNombre($nombre, $excluirId = null)
+    public function existeNombre()
     {
-        if ($excluirId === null) {
-            $st = $this->pdo->prepare('SELECT COUNT(*) AS n FROM CATEGORIA WHERE nombre = ?');
-            $st->execute([$nombre]);
+        if ($this->id === null) {
+            $st = $this->pdo->prepare(
+                'SELECT COUNT(*) AS n FROM CATEGORIA WHERE nombre = ?'
+            );
+            $st->execute([$this->nombre]);
         } else {
-            $st = $this->pdo->prepare('SELECT COUNT(*) AS n FROM CATEGORIA WHERE nombre = ? AND id <> ?');
-            $st->execute([$nombre, $excluirId]);
+            $st = $this->pdo->prepare(
+                'SELECT COUNT(*) AS n FROM CATEGORIA WHERE nombre = ? AND id <> ?'
+            );
+            $st->execute([$this->nombre, (int) $this->id]);
         }
-        $f = $st->fetch();
-        return ((int)$f['n']) > 0;
+
+        $fila = $st->fetch();
+        return (int) $fila['n'] > 0;
     }
 
-    // Para el mensaje amigable antes de que la BD frene con 1451 (RESTRICT).
-    public function tieneEjercicios($id)
+    public function tieneEjercicios()
     {
-        $st = $this->pdo->prepare('SELECT COUNT(*) AS n FROM EJERCICIO WHERE id_categoria = ?');
-        $st->execute([$id]);
-        $f = $st->fetch();
-        return ((int)$f['n']) > 0;
+        $st = $this->pdo->prepare(
+            'SELECT COUNT(*) AS n FROM EJERCICIO WHERE id_categoria = ?'
+        );
+        $st->execute([(int) $this->id]);
+        $fila = $st->fetch();
+
+        return (int) $fila['n'] > 0;
+    }
+
+    private function cargarDatos($fila)
+    {
+        $this->id = (int) $fila['id'];
+        $this->nombre = $fila['nombre'];
+        $this->descripcion = $fila['descripcion'];
+    }
+
+    private function aArray()
+    {
+        return [
+            'id' => $this->id,
+            'nombre' => $this->nombre,
+            'descripcion' => $this->descripcion,
+        ];
     }
 }
