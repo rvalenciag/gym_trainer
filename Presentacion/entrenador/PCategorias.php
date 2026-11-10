@@ -2,68 +2,56 @@
 // PCategorias: presentación de Gestión de Categorías (CU03). Formulario superior + tabla inferior.
 defined('APP') || exit('Acceso no permitido');
 require_once __DIR__ . '/../../Negocio/NCategoria.php';
-require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/PGestionBase.php';
 
-class PCategorias
+class PCategorias extends PGestionBase
 {
-    private int $idCategoria = 0;
+    protected string $titulo = 'Gestion de Categorías';
+    protected string $ruta = 'categorias';
+
+    // private int $idCategoria = 0;
     private string $nombre = '';
     private ?string $descripcion = null;
     private array $categorias = [];
 
-    private function listar()
+    #[Override]
+    protected function leerFormulario(): void
     {
-        return (new NCategoria())->listar();
+        $this->nombre = $_POST['nombre'] ?? '';
+        $this->descripcion = $_POST['descripcion'] ?? '';
     }
 
-    public function guardar()
+    protected function guardar(): array
     {
-        $res = (new NCategoria())->guardar($this->nombre, $this->descripcion ?? '');
-        flash($res['ok'] ? 'success' : 'danger', $res['msg']);
-        header('Location: index.php?r=categorias');
-        exit;
-    }
-
-    public function actualizar()
-    {
-        $res = (new NCategoria())->actualizar(
-            $this->idCategoria,
+        return (new NCategoria())->guardar(
             $this->nombre,
             $this->descripcion ?? ''
         );
-        flash($res['ok'] ? 'success' : 'danger', $res['msg']);
-        header('Location: index.php?r=categorias');
-        exit;
     }
 
-    public function eliminar()
+    protected function actualizar(): array
     {
-        $res = (new NCategoria())->eliminar($this->idCategoria);
-        flash($res['ok'] ? 'success' : 'danger', $res['msg']);
-        header('Location: index.php?r=categorias');
-        exit;
+        return (new NCategoria())->actualizar(
+            $this->idRegistro,
+            $this->nombre,
+            $this->descripcion ?? ''
+        );
     }
 
-    public function mostrar()
+    protected function eliminar(): array
     {
-        // Alta o edición (el hidden "id" decide).
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->idCategoria = (int) ($_POST['id'] ?? 0);
-            $this->nombre = $_POST['nombre'] ?? '';
-            $this->descripcion = $_POST['descripcion'] ?? null;
+        return (new NCategoria())->eliminar($this->idRegistro);
+    }
 
-            $this->idCategoria === 0
-                ? $this->guardar()
-                : $this->actualizar();
-        }
-        // Baja con confirmación previa en el navegador.
-        if (isset($_GET['del'])) {
-            $this->idCategoria = (int) $_GET['del'];
-            $this->eliminar();
-        }
-        $this->categorias = $this->listar();
-        mostrarHeader('Gestión de Categorías');
-?>
+    protected function prepararVista(): void
+    {
+        $this->categorias = (new NCategoria())->listar();
+    }
+
+    #[Override]
+    protected function renderizarVista(): void
+    {
+        ?>
         <section class="gym-card gym-form-card">
             <div class="gym-card-heading">
                 <span class="gym-heading-icon"><?php echo iconoGym('category'); ?></span>
@@ -138,6 +126,5 @@ class PCategorias
             </div>
         </section>
 <?php
-        mostrarFooter();
     }
 }
