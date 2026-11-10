@@ -22,7 +22,7 @@ class PClientes
 
     public function guardar()
     {
-        $res = (new NCliente())->registrar(
+        $res = (new NCliente())->guardar(
             $this->nombre,
             $this->correo,
             $this->telefono ?? '',

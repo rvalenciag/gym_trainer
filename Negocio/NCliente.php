@@ -10,7 +10,7 @@ class NCliente
         return (new DCliente())->listarConUsuario();
     }
 
-    public function registrar($nombre, $correo, $telefono, $clave, $observacion)
+    public function guardar($nombre, $correo, $telefono, $clave, $observacion)
     {
         $nombre = trim($nombre);
         $correo = trim($correo);
