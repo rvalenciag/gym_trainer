@@ -76,9 +76,17 @@ function textoBoton(btn, texto) {
 }
 
 // ---- CU03/CU04/CU05: modo edición sin recarga (data-* de la fila al form superior) ----
+var multimediaActual = null;
+
 document.querySelectorAll('[data-edit]').forEach(function(btn) {
     btn.addEventListener('click', function() {
         var d = btn.dataset;
+        if (d.tipo !== undefined) {
+            multimediaActual = {
+                tipo: d.tipo,
+                url: d.url || ''
+            };
+        }
         Object.keys(d).forEach(function(k) {
             if (k === 'edit') {
                 return;
@@ -132,11 +140,103 @@ if (cancel) {
         if (typeof toggleMedia === 'function') {
             toggleMedia();
         }
+        multimediaActual = null;
+        actualizarVistaPreviaMultimedia();
     });
 }
 
 // ---- CU04: mostrar input según tipo de multimedia ----
 var selTipo = document.getElementById('f-tipo');
+
+function ocultarVistaPreviaMultimedia() {
+    var contenedor = document.getElementById('media-actual');
+    if (!contenedor) {
+        return;
+    }
+    contenedor.replaceChildren();
+    contenedor.style.display = 'none';
+}
+
+function mostrarMensajeSinRecurso(contenedor, titulo) {
+    var encabezado = document.createElement('strong');
+    encabezado.textContent = titulo;
+    var mensaje = document.createElement('div');
+    mensaje.className = 'text-muted small mt-1';
+    mensaje.textContent = 'No hay un recurso multimedia guardado.';
+    contenedor.append(encabezado, mensaje);
+    contenedor.style.display = '';
+}
+
+function actualizarVistaPreviaMultimedia() {
+    var contenedor = document.getElementById('media-actual');
+    if (!contenedor || !selTipo || !multimediaActual || selTipo.value !== multimediaActual.tipo) {
+        ocultarVistaPreviaMultimedia();
+        return;
+    }
+
+    var tipo = multimediaActual.tipo;
+    var url = multimediaActual.url;
+    contenedor.replaceChildren();
+
+    if (tipo === 'VIDEO_URL') {
+        contenedor.style.display = 'none';
+        return;
+    }
+
+    if (tipo === 'IMAGEN') {
+        if (url === '') {
+            mostrarMensajeSinRecurso(contenedor, 'Imagen / Video actual');
+            return;
+        }
+
+        var esVideo = /\.(mp4|webm)(?:[?#].*)?$/i.test(url);
+        var etiqueta = document.createElement('strong');
+        etiqueta.textContent = esVideo ? 'Video actual' : 'Imagen actual';
+        var recurso = document.createElement(esVideo ? 'video' : 'img');
+        recurso.src = url;
+        recurso.className = 'img-fluid rounded border d-block mt-2';
+        recurso.style.maxHeight = '280px';
+        if (esVideo) {
+            recurso.controls = true;
+        } else {
+            recurso.alt = 'Recurso multimedia actual del ejercicio';
+        }
+        contenedor.append(etiqueta, recurso);
+        contenedor.style.display = '';
+        return;
+    }
+
+    if (tipo === 'IFRAME_HTML') {
+        if (url === '') {
+            mostrarMensajeSinRecurso(contenedor, 'Vista previa del iframe');
+            return;
+        }
+
+        var documento = new DOMParser().parseFromString(url, 'text/html');
+        var iframeOriginal = documento.querySelector('iframe');
+        var src = iframeOriginal ? iframeOriginal.getAttribute('src') : '';
+        if (!src || !/^https:\/\//i.test(src)) {
+            mostrarMensajeSinRecurso(contenedor, 'Vista previa del iframe');
+            return;
+        }
+
+        var etiquetaIframe = document.createElement('strong');
+        etiquetaIframe.textContent = 'Vista previa del iframe';
+        var iframe = document.createElement('iframe');
+        iframe.src = src;
+        iframe.title = iframeOriginal.getAttribute('title') || 'Vista previa multimedia';
+        iframe.className = 'w-100 rounded border d-block mt-2';
+        iframe.height = '280';
+        iframe.loading = 'lazy';
+        iframe.allowFullscreen = true;
+        contenedor.append(etiquetaIframe, iframe);
+        contenedor.style.display = '';
+        return;
+    }
+
+    ocultarVistaPreviaMultimedia();
+}
+
 function toggleMedia() {
     if (!selTipo) {
         return;
@@ -157,6 +257,7 @@ function toggleMedia() {
     document.querySelectorAll('[data-media-type]').forEach(function(tab) {
         tab.classList.toggle('active', tab.dataset.mediaType === v);
     });
+    actualizarVistaPreviaMultimedia();
 }
 if (selTipo) {
     selTipo.addEventListener('change', toggleMedia);

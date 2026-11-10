@@ -156,6 +156,7 @@ class PEjercicios
                                 <label class="visually-hidden" id="lbl-texto">URL del video</label>
                                 <input type="text" name="texto" id="f-texto" class="form-control" placeholder="https://...">
                             </div>
+                            <div id="media-actual" class="mt-3" style="display:none" aria-live="polite"></div>
                         </div>
                     </div>
                 </div>
@@ -195,9 +196,10 @@ class PEjercicios
                                         data-edit="<?php echo $e['id']; ?>"
                                         data-nombre="<?php echo htmlspecialchars($e['nombre'], ENT_QUOTES); ?>"
                                         data-id_categoria="<?php echo $e['id_categoria']; ?>"
-                                        data-descripcion="<?php echo htmlspecialchars($e['descripcion'] ?? '', ENT_QUOTES); ?>"
-                                        data-tipo="<?php echo $e['tipo_multimedia']; ?>"
-                                        data-texto="<?php echo $e['tipo_multimedia'] === 'IMAGEN' ? '' : htmlspecialchars($e['url'] ?? '', ENT_QUOTES); ?>"><?php echo iconoGym('edit'); ?></button>
+                                         data-descripcion="<?php echo htmlspecialchars($e['descripcion'] ?? '', ENT_QUOTES); ?>"
+                                         data-tipo="<?php echo $e['tipo_multimedia']; ?>"
+                                         data-url="<?php echo htmlspecialchars($e['url'] ?? '', ENT_QUOTES); ?>"
+                                         data-texto="<?php echo $e['tipo_multimedia'] === 'IMAGEN' ? '' : htmlspecialchars($e['url'] ?? '', ENT_QUOTES); ?>"><?php echo iconoGym('edit'); ?></button>
                                     <a class="gym-icon-btn gym-delete-btn" aria-label="Eliminar ejercicio"
                                         href="index.php?r=ejercicios&del=<?php echo $e['id']; ?>"
                                         onclick="return confirm('¿Eliminar este ejercicio?')"><?php echo iconoGym('delete'); ?></a>

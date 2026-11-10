@@ -211,7 +211,11 @@ body {
     top: 0;
     display: flex;
     flex-direction: column;
+    height: 100vh;
     min-height: 100vh;
+    align-self: start;
+    overflow-y: auto;
+    box-sizing: border-box;
     padding: 1.6rem 1.15rem;
     background: var(--gym-navy);
     color: #fff;
@@ -831,7 +835,10 @@ body {
     }
     .gym-sidebar {
         position: static;
+        height: auto;
         min-height: auto;
+        align-self: stretch;
+        overflow-y: visible;
         padding: 1rem;
     }
     .gym-brand {
