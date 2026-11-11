@@ -9,7 +9,6 @@ class PCategorias extends PGestionBase
     protected string $titulo = 'Gestion de Categorías';
     protected string $ruta = 'categorias';
 
-    // private int $idCategoria = 0;
     private string $nombre = '';
     private ?string $descripcion = null;
     private array $categorias = [];
@@ -21,6 +20,7 @@ class PCategorias extends PGestionBase
         $this->descripcion = $_POST['descripcion'] ?? '';
     }
 
+    #[Override]
     protected function guardar(): array
     {
         return (new NCategoria())->guardar(
@@ -29,6 +29,7 @@ class PCategorias extends PGestionBase
         );
     }
 
+    #[Override]
     protected function actualizar(): array
     {
         return (new NCategoria())->actualizar(
@@ -38,11 +39,13 @@ class PCategorias extends PGestionBase
         );
     }
 
+    #[Override]
     protected function eliminar(): array
     {
         return (new NCategoria())->eliminar($this->idRegistro);
     }
 
+    #[Override]
     protected function prepararVista(): void
     {
         $this->categorias = (new NCategoria())->listar();

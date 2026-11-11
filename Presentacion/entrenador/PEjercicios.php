@@ -5,11 +5,13 @@
 defined('APP') || exit('Acceso no permitido');
 require_once __DIR__ . '/../../Negocio/NEjercicio.php';
 require_once __DIR__ . '/../../Negocio/NCategoria.php';
-require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/PGestionBase.php';
 
-class PEjercicios
+class PEjercicios extends PGestionBase
 {
-    private int $idEjercicio = 0;
+    protected string $titulo = 'Gestión de Ejercicios';
+    protected string $ruta = 'ejercicios';
+
     private string $nombre = '';
     private int $idCategoria = 0;
     private ?string $descripcion = null;
@@ -20,17 +22,19 @@ class PEjercicios
     private array $ejercicios = [];
     private bool $sinCategorias = false;
 
-    private function listar()
+    #[Override]
+    protected function leerFormulario(): void
     {
-        return (new NEjercicio())->listar();
+        $this->nombre = $_POST['nombre'] ?? '';
+        $this->idCategoria = (int) ($_POST['id_categoria'] ?? 0);
+        $this->descripcion = $_POST['descripcion'] ?? null;
+        $this->tipoMultimedia = $_POST['tipo'] ?? 'IMAGEN';
+        $this->archivo = $_FILES['archivo'] ?? null;
+        $this->textoMultimedia = $_POST['texto'] ?? null;
     }
 
-    private function listarCategorias()
-    {
-        return (new NCategoria())->listar(); // desacoplado: solo lectura, sin reglas de por medio
-    }
-
-    public function guardar()
+    #[Override]
+    protected function guardar(): array
     {
         $res = (new NEjercicio())->guardar(
             $this->nombre,
@@ -42,15 +46,14 @@ class PEjercicios
         );
         $this->archivo = null;
 
-        flash($res['ok'] ? 'success' : 'danger', $res['msg']);
-        header('Location: index.php?r=ejercicios');
-        exit;
+        return $res;
     }
 
-    public function actualizar()
+    #[Override]
+    protected function actualizar(): array
     {
         $res = (new NEjercicio())->actualizar(
-            $this->idEjercicio,
+            $this->idRegistro,
             $this->nombre,
             $this->idCategoria,
             $this->descripcion ?? '',
@@ -60,43 +63,26 @@ class PEjercicios
         );
         $this->archivo = null;
 
-        flash($res['ok'] ? 'success' : 'danger', $res['msg']);
-        header('Location: index.php?r=ejercicios');
-        exit;
+        return $res;
     }
 
-    public function eliminar()
+    #[Override]
+    protected function eliminar(): array
     {
-        $res = (new NEjercicio())->eliminar($this->idEjercicio);
-        flash($res['ok'] ? 'success' : 'danger', $res['msg']);
-        header('Location: index.php?r=ejercicios');
-        exit;
+        return (new NEjercicio())->eliminar($this->idRegistro);
     }
 
-    public function mostrar()
+    #[Override]
+    protected function prepararVista(): void
     {
-        // Alta o edición (el hidden "id" decide). Ojo: el form usa enctype multipart por el archivo.
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->idEjercicio = (int) ($_POST['id'] ?? 0);
-            $this->nombre = $_POST['nombre'] ?? '';
-            $this->idCategoria = (int) ($_POST['id_categoria'] ?? 0);
-            $this->descripcion = $_POST['descripcion'] ?? null;
-            $this->tipoMultimedia = $_POST['tipo'] ?? 'IMAGEN';
-            $this->archivo = $_FILES['archivo'] ?? null;
-            $this->textoMultimedia = $_POST['texto'] ?? null;
-
-            $this->idEjercicio === 0
-                ? $this->guardar()
-                : $this->actualizar();
-        }
-        if (isset($_GET['del'])) {
-            $this->idEjercicio = (int) $_GET['del'];
-            $this->eliminar();
-        }
-        $this->categorias = $this->listarCategorias();
-        $this->ejercicios = $this->listar();
+        $this->categorias = (new NCategoria())->listar();
+        $this->ejercicios = (new NEjercicio())->listar();
         $this->sinCategorias = count($this->categorias) === 0;
-        mostrarHeader('Gestión de Ejercicios');
+    }
+
+    #[Override]
+    protected function renderizarVista(): void
+    {
         if ($this->sinCategorias) {
             echo '<div class="alert alert-warning">Debe crear categorías antes de registrar ejercicios</div>';
         }
@@ -216,6 +202,5 @@ class PEjercicios
             </div>
         </section>
 <?php
-        mostrarFooter();
     }
 }

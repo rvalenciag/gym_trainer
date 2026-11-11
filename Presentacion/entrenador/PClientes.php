@@ -3,11 +3,13 @@
 // Al editar se oculta la contraseña (JS): la clave solo se define al registrar (guardar).
 defined('APP') || exit('Acceso no permitido');
 require_once __DIR__ . '/../../Negocio/NCliente.php';
-require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/PGestionBase.php';
 
-class PClientes
+class PClientes extends PGestionBase
 {
-    private int $idCliente = 0;
+    protected string $titulo = 'Gestión de Clientes';
+    protected string $ruta = 'clientes';
+
     private string $nombre = '';
     private string $correo = '';
     private ?string $telefono = null;
@@ -15,12 +17,18 @@ class PClientes
     private ?string $observacion = null;
     private array $clientes = [];
 
-    private function listar()
+    #[Override]
+    protected function leerFormulario(): void
     {
-        return (new NCliente())->listar();
+        $this->nombre = $_POST['nombre'] ?? '';
+        $this->correo = $_POST['correo'] ?? '';
+        $this->telefono = $_POST['telefono'] ?? null;
+        $this->contrasena = $_POST['contrasena'] ?? null;
+        $this->observacion = $_POST['observacion'] ?? null;
     }
 
-    public function guardar()
+    #[Override]
+    protected function guardar(): array
     {
         $res = (new NCliente())->guardar(
             $this->nombre,
@@ -31,53 +39,36 @@ class PClientes
         );
         $this->contrasena = null;
 
-        flash($res['ok'] ? 'success' : 'danger', $res['msg']);
-        header('Location: index.php?r=clientes');
-        exit;
+        return $res;
     }
 
-    public function actualizar()
+    #[Override]
+    protected function actualizar(): array
     {
-        $res = (new NCliente())->actualizar(
-            $this->idCliente,
+        return (new NCliente())->actualizar(
+            $this->idRegistro,
             $this->nombre,
             $this->correo,
             $this->telefono ?? '',
             $this->observacion ?? ''
         );
-        flash($res['ok'] ? 'success' : 'danger', $res['msg']);
-        header('Location: index.php?r=clientes');
-        exit;
     }
 
-    public function eliminar()
+    #[Override]
+    protected function eliminar(): array
     {
-        $res = (new NCliente())->eliminar($this->idCliente);
-        flash($res['ok'] ? 'success' : 'danger', $res['msg']);
-        header('Location: index.php?r=clientes');
-        exit;
+        return (new NCliente())->eliminar($this->idRegistro);
     }
 
-    public function mostrar()
+    #[Override]
+    protected function prepararVista(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->idCliente = (int) ($_POST['id'] ?? 0);
-            $this->nombre = $_POST['nombre'] ?? '';
-            $this->correo = $_POST['correo'] ?? '';
-            $this->telefono = $_POST['telefono'] ?? null;
-            $this->contrasena = $_POST['contrasena'] ?? null;
-            $this->observacion = $_POST['observacion'] ?? null;
+        $this->clientes = (new NCliente())->listar();
+    }
 
-            $this->idCliente === 0
-                ? $this->guardar()
-                : $this->actualizar();
-        }
-        if (isset($_GET['del'])) {
-            $this->idCliente = (int) $_GET['del'];
-            $this->eliminar();
-        }
-        $this->clientes = $this->listar();
-        mostrarHeader('Gestión de Clientes');
+    #[Override]
+    protected function renderizarVista(): void
+    {
 ?>
         <section class="gym-card gym-form-card">
             <div class="gym-card-heading">
@@ -174,6 +165,5 @@ class PClientes
             </div>
         </section>
 <?php
-        mostrarFooter();
     }
 }
