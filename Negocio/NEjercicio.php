@@ -83,6 +83,14 @@ class NEjercicio
         ]);
         $ok = $ejercicio->actualizar();
 
+        if ($ok && $actual['url'] !== $ruta && $this->esArchivoLocal($actual['url'])) {
+            @unlink((string) $actual['url']);
+        }
+
+        if (!$ok && $ruta !== $actual['url'] && $this->esArchivoLocal($ruta)) {
+            @unlink((string) $ruta);
+        }
+
         return [
             'ok' => $ok,
             'msg' => $ok ? 'Ejercicio actualizado correctamente' : 'No se pudo actualizar',

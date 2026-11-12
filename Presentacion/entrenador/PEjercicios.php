@@ -136,7 +136,7 @@ class PEjercicios extends PGestionBase
                             <div id="w-archivo" class="gym-upload-box">
                                 <?php echo iconoGym('image'); ?>
                                 <div><strong>Seleccionar imagen del ejercicio</strong><span>JPG, PNG, WEBP, MP4 o WEBM · Máx. 16 MB</span></div>
-                                <input type="file" name="archivo" class="form-control" accept=".jpg,.jpeg,.png,.webp,.mp4,.webm">
+                                <input type="file" name="archivo" id="f-archivo" class="form-control" accept=".jpg,.jpeg,.png,.webp,.mp4,.webm">
                             </div>
                             <div id="w-texto" style="display:none">
                                 <label class="visually-hidden" id="lbl-texto">URL del video</label>

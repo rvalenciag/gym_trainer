@@ -77,11 +77,14 @@ function textoBoton(btn, texto) {
 
 // ---- CU03/CU04/CU05: modo edición sin recarga (data-* de la fila al form superior) ----
 var multimediaActual = null;
+var archivoSeleccionado = null;
+var urlArchivoTemporal = '';
 
 document.querySelectorAll('[data-edit]').forEach(function(btn) {
     btn.addEventListener('click', function() {
         var d = btn.dataset;
         if (d.tipo !== undefined) {
+            liberarArchivoTemporal(true);
             multimediaActual = {
                 tipo: d.tipo,
                 url: d.url || ''
@@ -137,10 +140,11 @@ if (cancel) {
         if (pass) {
             pass.style.display = '';
         }
+        multimediaActual = null;
+        liberarArchivoTemporal(true);
         if (typeof toggleMedia === 'function') {
             toggleMedia();
         }
-        multimediaActual = null;
         actualizarVistaPreviaMultimedia();
     });
 }
@@ -157,6 +161,20 @@ function ocultarVistaPreviaMultimedia() {
     contenedor.style.display = 'none';
 }
 
+function liberarArchivoTemporal(limpiarCampo) {
+    if (urlArchivoTemporal !== '') {
+        URL.revokeObjectURL(urlArchivoTemporal);
+    }
+    archivoSeleccionado = null;
+    urlArchivoTemporal = '';
+    if (limpiarCampo) {
+        var campoArchivo = document.getElementById('f-archivo');
+        if (campoArchivo) {
+            campoArchivo.value = '';
+        }
+    }
+}
+
 function mostrarMensajeSinRecurso(contenedor, titulo) {
     var encabezado = document.createElement('strong');
     encabezado.textContent = titulo;
@@ -167,70 +185,101 @@ function mostrarMensajeSinRecurso(contenedor, titulo) {
     contenedor.style.display = '';
 }
 
-function actualizarVistaPreviaMultimedia() {
-    var contenedor = document.getElementById('media-actual');
-    if (!contenedor || !selTipo || !multimediaActual || selTipo.value !== multimediaActual.tipo) {
+function mostrarImagenOVideo(contenedor, recurso) {
+    var esVideo = recurso.esVideo;
+    var etiqueta = document.createElement('strong');
+    etiqueta.textContent = esVideo
+        ? (recurso.temporal ? 'Video seleccionado' : 'Video actual')
+        : (recurso.temporal ? 'Imagen seleccionada' : 'Imagen actual');
+    var elemento = document.createElement(esVideo ? 'video' : 'img');
+    elemento.src = recurso.url;
+    elemento.className = 'img-fluid rounded border d-block mt-2';
+    elemento.style.maxHeight = '280px';
+    if (esVideo) {
+        elemento.controls = true;
+    } else {
+        elemento.alt = 'Recurso multimedia del ejercicio';
+    }
+    contenedor.append(etiqueta, elemento);
+    contenedor.style.display = '';
+}
+
+function mostrarIframe(contenedor, codigo, temporal) {
+    var documento = new DOMParser().parseFromString(codigo, 'text/html');
+    var iframeOriginal = documento.querySelector('iframe');
+    var src = iframeOriginal ? iframeOriginal.getAttribute('src') : '';
+    if (!src || !/^https:\/\//i.test(src)) {
         ocultarVistaPreviaMultimedia();
         return;
     }
 
-    var tipo = multimediaActual.tipo;
-    var url = multimediaActual.url;
+    var etiqueta = document.createElement('strong');
+    etiqueta.textContent = temporal ? 'Vista previa del iframe' : 'Iframe actual';
+    var iframe = document.createElement('iframe');
+    iframe.src = src;
+    iframe.title = iframeOriginal.getAttribute('title') || 'Vista previa multimedia';
+    iframe.className = 'w-100 rounded border d-block mt-2';
+    iframe.height = '280';
+    iframe.loading = 'lazy';
+    iframe.allowFullscreen = true;
+    contenedor.append(etiqueta, iframe);
+    contenedor.style.display = '';
+}
+
+function actualizarVistaPreviaMultimedia() {
+    var contenedor = document.getElementById('media-actual');
+    if (!contenedor || !selTipo) {
+        return;
+    }
+
+    var tipo = selTipo.value;
+    var texto = document.getElementById('f-texto');
     contenedor.replaceChildren();
 
     if (tipo === 'VIDEO_URL') {
-        contenedor.style.display = 'none';
+        ocultarVistaPreviaMultimedia();
+        return;
+    }
+
+    if (tipo === 'IMAGEN' && archivoSeleccionado !== null) {
+        mostrarImagenOVideo(contenedor, {
+            url: urlArchivoTemporal,
+            esVideo: /^video\//i.test(archivoSeleccionado.type)
+                || /\.(mp4|webm)$/i.test(archivoSeleccionado.name),
+            temporal: true
+        });
+        return;
+    }
+
+    if (tipo === 'IFRAME_HTML' && texto && texto.value.trim() !== '') {
+        mostrarIframe(contenedor, texto.value, true);
+        return;
+    }
+
+    if (!multimediaActual || tipo !== multimediaActual.tipo) {
+        ocultarVistaPreviaMultimedia();
         return;
     }
 
     if (tipo === 'IMAGEN') {
-        if (url === '') {
+        if (multimediaActual.url === '') {
             mostrarMensajeSinRecurso(contenedor, 'Imagen / Video actual');
             return;
         }
-
-        var esVideo = /\.(mp4|webm)(?:[?#].*)?$/i.test(url);
-        var etiqueta = document.createElement('strong');
-        etiqueta.textContent = esVideo ? 'Video actual' : 'Imagen actual';
-        var recurso = document.createElement(esVideo ? 'video' : 'img');
-        recurso.src = url;
-        recurso.className = 'img-fluid rounded border d-block mt-2';
-        recurso.style.maxHeight = '280px';
-        if (esVideo) {
-            recurso.controls = true;
-        } else {
-            recurso.alt = 'Recurso multimedia actual del ejercicio';
-        }
-        contenedor.append(etiqueta, recurso);
-        contenedor.style.display = '';
+        mostrarImagenOVideo(contenedor, {
+            url: multimediaActual.url,
+            esVideo: /\.(mp4|webm)(?:[?#].*)?$/i.test(multimediaActual.url),
+            temporal: false
+        });
         return;
     }
 
     if (tipo === 'IFRAME_HTML') {
-        if (url === '') {
+        if (multimediaActual.url === '') {
             mostrarMensajeSinRecurso(contenedor, 'Vista previa del iframe');
             return;
         }
-
-        var documento = new DOMParser().parseFromString(url, 'text/html');
-        var iframeOriginal = documento.querySelector('iframe');
-        var src = iframeOriginal ? iframeOriginal.getAttribute('src') : '';
-        if (!src || !/^https:\/\//i.test(src)) {
-            mostrarMensajeSinRecurso(contenedor, 'Vista previa del iframe');
-            return;
-        }
-
-        var etiquetaIframe = document.createElement('strong');
-        etiquetaIframe.textContent = 'Vista previa del iframe';
-        var iframe = document.createElement('iframe');
-        iframe.src = src;
-        iframe.title = iframeOriginal.getAttribute('title') || 'Vista previa multimedia';
-        iframe.className = 'w-100 rounded border d-block mt-2';
-        iframe.height = '280';
-        iframe.loading = 'lazy';
-        iframe.allowFullscreen = true;
-        contenedor.append(etiquetaIframe, iframe);
-        contenedor.style.display = '';
+        mostrarIframe(contenedor, multimediaActual.url, false);
         return;
     }
 
@@ -268,6 +317,23 @@ if (selTipo) {
         });
     });
     toggleMedia();
+}
+
+var campoArchivo = document.getElementById('f-archivo');
+if (campoArchivo) {
+    campoArchivo.addEventListener('change', function() {
+        liberarArchivoTemporal(false);
+        if (campoArchivo.files && campoArchivo.files[0]) {
+            archivoSeleccionado = campoArchivo.files[0];
+            urlArchivoTemporal = URL.createObjectURL(archivoSeleccionado);
+        }
+        actualizarVistaPreviaMultimedia();
+    });
+}
+
+var campoTextoMultimedia = document.getElementById('f-texto');
+if (campoTextoMultimedia) {
+    campoTextoMultimedia.addEventListener('input', actualizarVistaPreviaMultimedia);
 }
 
 // Login y alta de clientes: alternar visibilidad sin modificar el valor enviado.
